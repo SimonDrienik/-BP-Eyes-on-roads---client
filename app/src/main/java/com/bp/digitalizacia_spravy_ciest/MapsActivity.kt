@@ -144,7 +144,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             }
         }
     }
-    //kliknutie na nejaky bojekt ako obchod, restauracia.... vyznaci marker s nazvom daneho objektu
+    //kliknutie na nejaky bojekt ako obchod, restauracia.... vyznaci marker s nazvom daneho objektu5y5y5y5y
     private fun setPoiClick(map: GoogleMap) {
         map.setOnPoiClickListener { poi ->
             //zoberie nazov poi objektu
