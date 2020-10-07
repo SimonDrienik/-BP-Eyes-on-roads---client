@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "Digitalizacia_spravy_ciest"
