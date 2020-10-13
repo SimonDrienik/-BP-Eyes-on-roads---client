@@ -19,4 +19,16 @@
     <item>Kvalita opravy</item>
     <item>Zelen</item>
 </string-array>
+
+    <string name="spinner2_name">SpinnerInKotlin</string>
+    <string name="nove_hlasenie">Nove hlasenie</string>
+
+    <string-array name="stav_problemu">
+        <item>Stav problemu</item>
+        <item>Chybajuca</item>
+        <item>Poskodena</item>
+        <item>Vyblednuta</item>
+        <item>Zle viditelna</item>
+        <item>Prerastena</item>
+    </string-array>
 </resources>

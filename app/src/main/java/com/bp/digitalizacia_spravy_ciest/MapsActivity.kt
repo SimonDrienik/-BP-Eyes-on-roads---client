@@ -1,8 +1,10 @@
 package com.bp.digitalizacia_spravy_ciest
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -14,6 +16,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import java.time.LocalDateTime
 import java.util.*
 
 class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -22,15 +25,20 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
 
-    val id = "1"
-    val date = "7.10.2020"
-    val kategoria = "strom na ceste"
-    val popis = "text popisu"
-    val stav_problemu = "nevyriesene"
-    val stav_riesenia = "v procese"
-    val popis_riesenia_problemu = "nechce sa nam"
-
-
+    private val classNewReportActivity = NewReportActivity()
+    private var selectedId = classNewReportActivity.id
+    private val selectedPopisStavuRieseniaProblemu: String
+        get() = classNewReportActivity.popisStavuRieseniaProblemu
+    private val selectedStavRieseniaProblemu: String
+        get() = classNewReportActivity.stavRieseniaProblemu
+    private val selectedTextSelectedStavProblemu: String
+        get() = classNewReportActivity.textSelectedStavProblemu
+    private val selectedTextSelectedStavVozovky: String
+        get() = classNewReportActivity.textSelectedStavVozovky
+    private val selectedCurrent: LocalDateTime
+        get() = classNewReportActivity.current
+    private val selectedDescription: String
+        get() = classNewReportActivity.description
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +48,14 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        val buttonNewReport = findViewById<Button>(R.id.buttonNoveHlasenie)
+        buttonNewReport?.setOnClickListener()
+        {
+            val intent = Intent(this, NewReportActivity::class.java).apply {
+                startActivity(this)
+            }
+        }
 
     }
 
@@ -60,6 +76,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         map.getUiSettings().setZoomControlsEnabled(true)
         map.setOnMarkerClickListener(this)
         setUpMap()
+        //if (selectedId != 0)
         setMapLongClick(map)
         map.setInfoWindowAdapter(CustomInfoWindowForGoogleMap(this)) //pridanie noveho layoutu pre info window
        // setPoiClick(map)
@@ -121,13 +138,13 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
            val snippet = String.format(
                 Locale.getDefault(),
                 "Position: Lat: %1$.5f, Long: %2$.5f\n " +
-                        "id: $id\n " +
-                        "datum: $date\n " +
-                        "kategoria: $kategoria\n " +
-                        "popis: $popis\n " +
-                        "stav problemu: $stav_problemu\n " +
-                        "stav riesenia problemu: $stav_riesenia\n " +
-                        "popis rieseneho problemu: $popis_riesenia_problemu\n ",
+                        "id: $selectedId\n " +
+                        "datum: $selectedCurrent\n " +
+                        "kategoria: $selectedTextSelectedStavVozovky\n " +
+                        "popis: $selectedDescription\n " +
+                        "stav problemu: $selectedTextSelectedStavProblemu\n " +
+                        "stav riesenia problemu: $selectedStavRieseniaProblemu\n " +
+                        "popis rieseneho problemu: $selectedPopisStavuRieseniaProblemu\n ",
                 latLng.latitude,
                 latLng.longitude
             )
@@ -138,9 +155,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     .position(latLng)
                     .snippet(snippet)
             )
-            /*val intent = Intent(this, NewReportActivity::class.java).apply {
-                startActivity(this)
-            }*/
+
         }
     }
     //kliknutie na nejaky bojekt ako obchod, restauracia.... vyznaci marker s nazvom daneho objektu5y5y5y5y
