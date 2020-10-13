@@ -1,6 +1,5 @@
 package com.bp.digitalizacia_spravy_ciest
 
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -139,9 +138,9 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     .position(latLng)
                     .snippet(snippet)
             )
-            val intent = Intent(this, NewReportActivity::class.java).apply {
+            /*val intent = Intent(this, NewReportActivity::class.java).apply {
                 startActivity(this)
-            }
+            }*/
         }
     }
     //kliknutie na nejaky bojekt ako obchod, restauracia.... vyznaci marker s nazvom daneho objektu5y5y5y5y
