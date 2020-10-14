@@ -3,8 +3,10 @@ package com.bp.digitalizacia_spravy_ciest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -25,22 +27,29 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
 
-    private val classNewReportActivity = NewReportActivity()
-    private var selectedId = classNewReportActivity.id
-    private val selectedPopisStavuRieseniaProblemu: String
-        get() = classNewReportActivity.popisStavuRieseniaProblemu
-    private val selectedStavRieseniaProblemu: String
-        get() = classNewReportActivity.stavRieseniaProblemu
-    private val selectedTextSelectedStavProblemu: String
-        get() = classNewReportActivity.textSelectedStavProblemu
-    private val selectedTextSelectedStavVozovky: String
-        get() = classNewReportActivity.textSelectedStavVozovky
-    private val selectedCurrent: LocalDateTime
-        get() = classNewReportActivity.current
-    private val selectedDescription: String
-        get() = classNewReportActivity.description
+
+   // var classNewReportActivity = NewReportActivity()
+    private var id : Int = 0
+    private var stav_vozovky : String = ""
+    private var stav_problemu : String = ""
+    private var stav_riesenia_problemu : String = ""
+    private var description : String = ""
+    private var popis_stavu_riesenia_problemu : String = ""
+
+        /*val selectedPopisStavuRieseniaProblemu: String = classNewReportActivity.popisStavuRieseniaProblemu
+        val selectedStavRieseniaProblemu: String = classNewReportActivity.stavRieseniaProblemu
+        val selectedTextSelectedStavProblemu: String = classNewReportActivity.textSelectedStavProblemu
+        var selectedTextSelectedStavVozovky: String = classNewReportActivity.textSelectedStavVozovky
+        @RequiresApi(Build.VERSION_CODES.O)
+        val selectedCurrent: LocalDateTime = LocalDateTime.now()
+        val selectedDescription: String = classNewReportActivity.description
+        var idSelected: Int = classNewReportActivity.id*/
+    @RequiresApi(Build.VERSION_CODES.O)
+     val selectedCurrent: LocalDateTime = LocalDateTime.now()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -49,13 +58,25 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+
+        val extras = intent.extras
+        if (null != extras) {
+            id = extras.getInt("id")
+            stav_vozovky = extras.getString("stav_vozovky").toString()
+            stav_problemu = extras.getString("stav_problemu").toString()
+            stav_riesenia_problemu = extras.getString("stav_riesenia_problemu").toString()
+            description = extras.getString("description").toString()
+            popis_stavu_riesenia_problemu = extras.getString("popis_stavu_riesenia_problemu").toString()
+        }
+
         val buttonNewReport = findViewById<Button>(R.id.buttonNoveHlasenie)
         buttonNewReport?.setOnClickListener()
         {
-            val intent = Intent(this, NewReportActivity::class.java).apply {
+            Intent(this, NewReportActivity::class.java).apply {
                 startActivity(this)
             }
         }
+
 
     }
 
@@ -76,8 +97,10 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         map.getUiSettings().setZoomControlsEnabled(true)
         map.setOnMarkerClickListener(this)
         setUpMap()
-        //if (selectedId != 0)
-        setMapLongClick(map)
+        if (id != 0) {
+            setMapLongClick(map)
+        }
+
         map.setInfoWindowAdapter(CustomInfoWindowForGoogleMap(this)) //pridanie noveho layoutu pre info window
        // setPoiClick(map)
     }
@@ -132,19 +155,19 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     //pridanie markera po dlhom stlaceni screenu
     private fun setMapLongClick(map:GoogleMap) {
-        map.setOnMapLongClickListener {latLng ->
 
+        map.setOnMapLongClickListener {latLng ->
             //info okno o markeru
            val snippet = String.format(
                 Locale.getDefault(),
                 "Position: Lat: %1$.5f, Long: %2$.5f\n " +
-                        "id: $selectedId\n " +
+                        "id: $id\n " +
                         "datum: $selectedCurrent\n " +
-                        "kategoria: $selectedTextSelectedStavVozovky\n " +
-                        "popis: $selectedDescription\n " +
-                        "stav problemu: $selectedTextSelectedStavProblemu\n " +
-                        "stav riesenia problemu: $selectedStavRieseniaProblemu\n " +
-                        "popis rieseneho problemu: $selectedPopisStavuRieseniaProblemu\n ",
+                        "kategoria: $stav_vozovky\n " +
+                        "popis: $description\n " +
+                        "stav problemu: $stav_problemu\n " +
+                        "stav riesenia problemu: $stav_riesenia_problemu\n " +
+                        "popis rieseneho problemu: $popis_stavu_riesenia_problemu\n ",
                 latLng.latitude,
                 latLng.longitude
             )

@@ -1,41 +1,37 @@
 package com.bp.digitalizacia_spravy_ciest
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import java.time.LocalDateTime
-
 
 class NewReportActivity : AppCompatActivity()  {
-     lateinit var editText: EditText
-     internal var description = ""
-     internal var id = 0
-     internal var popisStavuRieseniaProblemu = ""
-     internal var stavRieseniaProblemu = ""
-     internal var textSelectedStavProblemu = ""
-     internal var textSelectedStavVozovky = ""
-     @RequiresApi(Build.VERSION_CODES.O)
-     internal var current: LocalDateTime = LocalDateTime.now()
-     @RequiresApi(Build.VERSION_CODES.O)
+
+    lateinit var editText: EditText
+    internal var description: String = "test"
+    internal var popisStavuRieseniaProblemu: String = "test"
+    internal var stavRieseniaProblemu: String = "test"
+    internal var textSelectedStavProblemu: String = "test"
+    internal var id: Int = 0
+    internal var textSelectedStavVozovky: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.new_report)
         val button = findViewById<Button>(R.id.button2)
         button?.setOnClickListener()
         {
-            val intent = Intent(this, MapsActivity::class.java).apply {
+             Intent(this, MapsActivity::class.java).apply {
             startActivity(this)
             }
         }
 
          editText = findViewById(R.id.description)
-
+        val spinner: Spinner = findViewById<Spinner>(R.id.spinner)
         val languages = resources.getStringArray(R.array.Languages)
-        val spinner = findViewById<Spinner>(R.id.spinner)
+
         if (spinner != null) {
             val adapter = ArrayAdapter(
                 this,
@@ -89,24 +85,27 @@ class NewReportActivity : AppCompatActivity()  {
         val button3 = findViewById<Button>(R.id.button3)
         button3?.setOnClickListener()
         {
-            val selectedStavVozovky = findViewById(R.id.spinner) as Spinner
-            this.textSelectedStavVozovky = spinner.selectedItem.toString()
+           id = 1
+            // val selectedStavVozovky = findViewById(R.id.spinner) as Spinner
+            textSelectedStavVozovky = spinner.selectedItem.toString()
+            //val selectedStavProblemu = findViewById(R.id.spinner2) as Spinner
+            textSelectedStavProblemu = spinner2.selectedItem.toString()
+            stavRieseniaProblemu = "neuvedene"
+            popisStavuRieseniaProblemu = "neuvedene"
 
-            val selectedStavProblemu = findViewById(R.id.spinner2) as Spinner
-            this.textSelectedStavProblemu = spinner2.selectedItem.toString()
-
-            this.stavRieseniaProblemu = "neuvedene"
-            this.popisStavuRieseniaProblemu = "neuvedene"
-            this.id = 1
-            this.description = editText.text.toString()
-
-            val intent = Intent(this, MapsActivity::class.java).apply {
-                startActivity(this)
-            }
+            description = editText.text.toString()
             val toast: Unit = Toast.makeText(this, "Vyberte na mape miesto dlhym klikom", Toast.LENGTH_LONG).show()
-
+            val intent = Intent(this, MapsActivity::class.java)
+                intent.putExtra("id", id)
+                intent.putExtra("stav_vozovky", textSelectedStavVozovky)
+                intent.putExtra("stav_problemu", textSelectedStavProblemu)
+                intent.putExtra("stav_riesenia_problemu", stavRieseniaProblemu)
+                intent.putExtra("popis_stavu_riesenia_problemu", popisStavuRieseniaProblemu)
+                intent.putExtra("description",description)
+                startActivity(intent)
         }
 
     }
+
 }
 
