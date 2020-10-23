@@ -22,6 +22,7 @@
 
     <string name="spinner2_name">SpinnerInKotlin</string>
     <string name="nove_hlasenie">Nove hlasenie</string>
+    <string name="api_key">api_key</string>
 
     <string-array name="stav_problemu">
         <item>Stav problemu</item>

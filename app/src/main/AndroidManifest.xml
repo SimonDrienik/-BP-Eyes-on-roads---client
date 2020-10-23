@@ -43,6 +43,36 @@
             android:name=".NewReportActivity"
             android:screenOrientation="portrait">
         </activity>
+
+       <!-- <activity
+            android:name=".ConnectActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>-->
+
+        <!-- All Product Activity -->
+        <activity
+            android:name=".AllProblemsActivity"
+            android:label="All problem" >
+        </activity>
+        <!-- Add Product Activity -->
+        <activity
+            android:name=".NewProblemActivity"
+            android:label="Add New problem" >
+        </activity>
+        <!-- Edit Product Activity -->
+        <activity
+            android:name=".EditProblemActivity"
+            android:label="Edit Problem" >
+        </activity>
+
     </application>
+
+    <!--  Internet Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

@@ -1,10 +1,12 @@
 package com.bp.digitalizacia_spravy_ciest
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -18,10 +20,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.journaldev.retrofitintro.ApiClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.time.LocalDateTime
 import java.util.*
 
-class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+
+class MapsActivity(private var list: MutableList<Problems>) :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -44,6 +51,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         val selectedCurrent: LocalDateTime = LocalDateTime.now()
         val selectedDescription: String = classNewReportActivity.description
         var idSelected: Int = classNewReportActivity.id*/
+
     @RequiresApi(Build.VERSION_CODES.O)
      val selectedCurrent: LocalDateTime = LocalDateTime.now()
 
@@ -57,6 +65,50 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        fun getUsersData() {
+
+            //showProgressBar()
+
+            ApiClient.apiService.getProblems().enqueue(object : Callback<MutableList<Problems>> {
+                override fun onFailure(call: Call<MutableList<Problems>>, t: Throwable) {
+                    //hideProgressBar()
+                    Log.e("error", t.localizedMessage)
+                }
+
+                override fun onResponse(
+                    call: Call<MutableList<Problems>>,
+                    response: Response<MutableList<Problems>>
+                ) {
+                    //hideProgressBar()
+                    val problem = list.get(1)
+                    val id1 = problem.id
+                    val position = problem.poloha!!
+                    val opis = problem.popis
+                    val parts = position.split(',')
+                    val double1: Double = parts[0].toDouble()
+                    val double2: Double = parts[1].toDouble()
+                    val snippet = String.format(
+                        Locale.getDefault(),
+                        "Position: Lat: %1$.5f, Long: %2$.5f\n " +
+                                "id: $id1\n " +
+                                "popis: $opis\n "
+
+
+                    )
+
+                    map.addMarker(
+                        MarkerOptions()
+                            .title("cestny problem")
+                            .position(LatLng(double1, double2))
+                            .snippet(snippet)
+                    )
+
+                }
+
+            })
+
+        }
 
 
         val extras = intent.extras
@@ -125,10 +177,14 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     private fun setUpMap() {
         //zistime ci appka ziskala povolenie na zdielanie uzivatelovej polohy a ak nie tak poziada
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE
+            )
             return
         }
         //umoznuje aby poloha bola na mape zvyraznena modrym kruhom, na ktory ked sa klikne sa vycentruje pozicia
@@ -154,23 +210,23 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     }
 
     //pridanie markera po dlhom stlaceni screenu
-    private fun setMapLongClick(map:GoogleMap) {
+    private fun setMapLongClick(map: GoogleMap) {
 
-        map.setOnMapLongClickListener {latLng ->
+        map.setOnMapLongClickListener { latLng ->
             //info okno o markeru
            val snippet = String.format(
-                Locale.getDefault(),
-                "Position: Lat: %1$.5f, Long: %2$.5f\n " +
-                        "id: $id\n " +
-                        "datum: $selectedCurrent\n " +
-                        "kategoria: $stav_vozovky\n " +
-                        "popis: $description\n " +
-                        "stav problemu: $stav_problemu\n " +
-                        "stav riesenia problemu: $stav_riesenia_problemu\n " +
-                        "popis rieseneho problemu: $popis_stavu_riesenia_problemu\n ",
-                latLng.latitude,
-                latLng.longitude
-            )
+               Locale.getDefault(),
+               "Position: Lat: %1$.5f, Long: %2$.5f\n " +
+                       "id: $id\n " +
+                       "datum: $selectedCurrent\n " +
+                       "kategoria: $stav_vozovky\n " +
+                       "popis: $description\n " +
+                       "stav problemu: $stav_problemu\n " +
+                       "stav riesenia problemu: $stav_riesenia_problemu\n " +
+                       "popis rieseneho problemu: $popis_stavu_riesenia_problemu\n ",
+               latLng.latitude,
+               latLng.longitude
+           )
 
             map.addMarker(
                 MarkerOptions()
