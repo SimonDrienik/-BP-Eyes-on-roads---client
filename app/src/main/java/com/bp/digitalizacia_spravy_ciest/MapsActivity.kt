@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -20,7 +21,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.journaldev.retrofitintro.ApiClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,11 +28,13 @@ import java.time.LocalDateTime
 import java.util.*
 
 
-class MapsActivity(private var list: MutableList<Problems>) :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
+
 
 
    // var classNewReportActivity = NewReportActivity()
@@ -65,52 +67,7 @@ class MapsActivity(private var list: MutableList<Problems>) :AppCompatActivity()
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        fun getUsersData() {
-
-            //showProgressBar()
-
-            ApiClient.apiService.getProblems().enqueue(object : Callback<MutableList<Problems>> {
-                override fun onFailure(call: Call<MutableList<Problems>>, t: Throwable) {
-                    //hideProgressBar()
-                    Log.e("error", t.localizedMessage)
-                }
-
-                override fun onResponse(
-                    call: Call<MutableList<Problems>>,
-                    response: Response<MutableList<Problems>>
-                ) {
-                    //hideProgressBar()
-                    val problem = list.get(1)
-                    val id1 = problem.id
-                    val position = problem.poloha!!
-                    val opis = problem.popis
-                    val parts = position.split(',')
-                    val double1: Double = parts[0].toDouble()
-                    val double2: Double = parts[1].toDouble()
-                    val snippet = String.format(
-                        Locale.getDefault(),
-                        "Position: Lat: %1$.5f, Long: %2$.5f\n " +
-                                "id: $id1\n " +
-                                "popis: $opis\n "
-
-
-                    )
-
-                    map.addMarker(
-                        MarkerOptions()
-                            .title("cestny problem")
-                            .position(LatLng(double1, double2))
-                            .snippet(snippet)
-                    )
-
-                }
-
-            })
-
-        }
-
-
+        Log.d("TAG", "test1")
         val extras = intent.extras
         if (null != extras) {
             id = extras.getInt("id")
@@ -120,6 +77,12 @@ class MapsActivity(private var list: MutableList<Problems>) :AppCompatActivity()
             description = extras.getString("description").toString()
             popis_stavu_riesenia_problemu = extras.getString("popis_stavu_riesenia_problemu").toString()
         }
+
+       // Toast.makeText(this@MapsActivity, "ok", Toast.LENGTH_SHORT).show()
+
+
+
+
 
         val buttonNewReport = findViewById<Button>(R.id.buttonNoveHlasenie)
         buttonNewReport?.setOnClickListener()
@@ -149,6 +112,7 @@ class MapsActivity(private var list: MutableList<Problems>) :AppCompatActivity()
         map.getUiSettings().setZoomControlsEnabled(true)
         map.setOnMarkerClickListener(this)
         setUpMap()
+        getAll(map)
         if (id != 0) {
             setMapLongClick(map)
         }
@@ -237,6 +201,75 @@ class MapsActivity(private var list: MutableList<Problems>) :AppCompatActivity()
 
         }
     }
+
+    fun getAll(map: GoogleMap) {
+        val request = ServiceBuilder.buildService(problemsAPI::class.java)
+
+        val call = request.getProblems()
+        call!!.enqueue(object : Callback<List<Problems?>?> {
+            override fun onResponse(
+                call: Call<List<Problems?>?>,
+                response: Response<List<Problems?>?>
+            ) {
+                if (response.body() != null) {
+                    Toast.makeText(this@MapsActivity, "ok", Toast.LENGTH_SHORT).show()
+                }
+                val problemList = response.body()
+                Log.d("TAG", "vypis")
+                //Log.i("TAG", problemList!![0]!!.poloha+"");
+                if (problemList != null) {
+                    var i = 0
+
+                    for (item in problemList) {
+
+                        var pos = item!!.position
+                        var postSplit = pos?.split(",")
+                        var pos1 = postSplit?.get(0)?.toDouble()
+                        var pos2 = postSplit?.get(1)?.toDouble()
+                        var id_problemu =  item!!.id
+                        var popis = item!!.popis
+                        var kategoria = item!!.kategoria
+                        var stavRieseniaProblemu =item!!.stav_riesenia_problemu
+                        var stav_problemu = item!!.stav_problemu
+                        var PopisStavuRieseniaProblemu = item!!.popis_riesenia_problemu
+                        var created_at = item!!.created_at
+
+                        Toast.makeText(this@MapsActivity, "ok $i", Toast.LENGTH_SHORT).show()
+
+                        Log.d("TAG", pos1.toString())
+                        Log.d("TAG", pos2.toString())
+                        Log.d("TAG", id_problemu.toString())
+                        Log.d("TAG", popis.toString())
+                        val snippet = String.format(
+                            Locale.getDefault(),
+                            "Position: Lat: $pos1, Long: $pos2\n " +
+                                    "id: $id_problemu\n " +
+                                    "kategoria: $kategoria\n " +
+                                    "popis: $popis\n " +
+                                    "Stav Riesenia Problemu: $stavRieseniaProblemu\n " +
+                                    "Stav Problemu: $stav_problemu\n " +
+                                    "popis stavu riesenia problemu: $PopisStavuRieseniaProblemu\n " +
+                                    "datum: $created_at"
+                        )
+
+                        map.addMarker(
+                            MarkerOptions()
+                                .title("cestny problem")
+                                .position(LatLng(pos1!!, pos2!!))
+                                .snippet(snippet)
+                        )
+
+                        i += 1
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<Problems?>?>, t: Throwable) {
+                Toast.makeText(applicationContext, t.message,
+                    Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
     //kliknutie na nejaky bojekt ako obchod, restauracia.... vyznaci marker s nazvom daneho objektu5y5y5y5y
     private fun setPoiClick(map: GoogleMap) {
         map.setOnPoiClickListener { poi ->
@@ -253,5 +286,6 @@ class MapsActivity(private var list: MutableList<Problems>) :AppCompatActivity()
 
 
 }
+
 
 

@@ -5,10 +5,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ServiceBuilder {
-    private val client = OkHttpClient.Builder().build()
 
+    private val client = OkHttpClient.Builder().build()
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://147.175.204.24/")
+
+        .baseUrl("http://147.175.204.24")
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
@@ -16,4 +17,5 @@ object ServiceBuilder {
     fun<T> buildService(service: Class<T>): T{
         return retrofit.create(service)
     }
+
 }
