@@ -90,17 +90,17 @@ class NewReportActivity : AppCompatActivity()  {
             textSelectedStavVozovky = spinner.selectedItem.toString()
             //val selectedStavProblemu = findViewById(R.id.spinner2) as Spinner
             textSelectedStavProblemu = spinner2.selectedItem.toString()
-            stavRieseniaProblemu = "neuvedene"
-            popisStavuRieseniaProblemu = "neuvedene"
+            //stavRieseniaProblemu = "neuvedene"
+            //popisStavuRieseniaProblemu = "neuvedene"
 
             description = editText.text.toString()
             val toast: Unit = Toast.makeText(this, "Vyberte na mape miesto dlhym klikom", Toast.LENGTH_LONG).show()
             val intent = Intent(this, MapsActivity::class.java)
-                intent.putExtra("id", id)
+                //intent.putExtra("id", id)
                 intent.putExtra("stav_vozovky", textSelectedStavVozovky)
                 intent.putExtra("stav_problemu", textSelectedStavProblemu)
-                intent.putExtra("stav_riesenia_problemu", stavRieseniaProblemu)
-                intent.putExtra("popis_stavu_riesenia_problemu", popisStavuRieseniaProblemu)
+                //intent.putExtra("stav_riesenia_problemu", stavRieseniaProblemu)
+                //intent.putExtra("popis_stavu_riesenia_problemu", popisStavuRieseniaProblemu)
                 intent.putExtra("description",description)
                 startActivity(intent)
         }

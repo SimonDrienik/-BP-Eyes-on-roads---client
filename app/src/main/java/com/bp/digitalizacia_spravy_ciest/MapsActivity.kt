@@ -44,15 +44,17 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private var stav_riesenia_problemu : String = ""
     private var description : String = ""
     private var popis_stavu_riesenia_problemu : String = ""
+    var extras : Bundle? = null
 
-        /*val selectedPopisStavuRieseniaProblemu: String = classNewReportActivity.popisStavuRieseniaProblemu
-        val selectedStavRieseniaProblemu: String = classNewReportActivity.stavRieseniaProblemu
-        val selectedTextSelectedStavProblemu: String = classNewReportActivity.textSelectedStavProblemu
-        var selectedTextSelectedStavVozovky: String = classNewReportActivity.textSelectedStavVozovky
-        @RequiresApi(Build.VERSION_CODES.O)
-        val selectedCurrent: LocalDateTime = LocalDateTime.now()
-        val selectedDescription: String = classNewReportActivity.description
-        var idSelected: Int = classNewReportActivity.id*/
+
+    /*val selectedPopisStavuRieseniaProblemu: String = classNewReportActivity.popisStavuRieseniaProblemu
+    val selectedStavRieseniaProblemu: String = classNewReportActivity.stavRieseniaProblemu
+    val selectedTextSelectedStavProblemu: String = classNewReportActivity.textSelectedStavProblemu
+    var selectedTextSelectedStavVozovky: String = classNewReportActivity.textSelectedStavVozovky
+    @RequiresApi(Build.VERSION_CODES.O)
+    val selectedCurrent: LocalDateTime = LocalDateTime.now()
+    val selectedDescription: String = classNewReportActivity.description
+    var idSelected: Int = classNewReportActivity.id*/
 
     @RequiresApi(Build.VERSION_CODES.O)
      val selectedCurrent: LocalDateTime = LocalDateTime.now()
@@ -68,14 +70,14 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         Log.d("TAG", "test1")
-        val extras = intent.extras
+        extras = intent.extras
         if (null != extras) {
-            id = extras.getInt("id")
-            stav_vozovky = extras.getString("stav_vozovky").toString()
-            stav_problemu = extras.getString("stav_problemu").toString()
-            stav_riesenia_problemu = extras.getString("stav_riesenia_problemu").toString()
-            description = extras.getString("description").toString()
-            popis_stavu_riesenia_problemu = extras.getString("popis_stavu_riesenia_problemu").toString()
+            //id = extras.getInt("id")
+            stav_vozovky = extras!!.getString("stav_vozovky").toString()
+            stav_problemu = extras!!.getString("stav_problemu").toString()
+            //stav_riesenia_problemu = extras.getString("stav_riesenia_problemu").toString()
+            description = extras!!.getString("description").toString()
+            //popis_stavu_riesenia_problemu = extras.getString("popis_stavu_riesenia_problemu").toString()
         }
 
        // Toast.makeText(this@MapsActivity, "ok", Toast.LENGTH_SHORT).show()
@@ -113,7 +115,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         map.setOnMarkerClickListener(this)
         setUpMap()
         getAll(map)
-        if (id != 0) {
+        if (extras != null) {
             setMapLongClick(map)
         }
 
@@ -178,38 +180,37 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
         map.setOnMapLongClickListener { latLng ->
             //info okno o markeru
-           val snippet = String.format(
-               Locale.getDefault(),
-               "Position: Lat: %1$.5f, Long: %2$.5f\n " +
-                       "id: $id\n " +
-                       "datum: $selectedCurrent\n " +
-                       "kategoria: $stav_vozovky\n " +
-                       "popis: $description\n " +
-                       "stav problemu: $stav_problemu\n " +
-                       "stav riesenia problemu: $stav_riesenia_problemu\n " +
-                       "popis rieseneho problemu: $popis_stavu_riesenia_problemu\n ",
-               latLng.latitude,
-               latLng.longitude
-           )
-
-            map.addMarker(
-                MarkerOptions()
-                    .title("cestny problem")
-                    .position(latLng)
-                    .snippet(snippet)
+            Locale.getDefault()
+            val restapiservice = RestApiService()
+            val unregisteredpostproblemdata = UnregisteredPostProblemData(
+                id = null,
+                poloha = "%1$.5f,%2$.5f",
+                popis_problemu = description,
+                kategoria_problemu = stav_vozovky,
+                stav_problemu = stav_problemu
             )
 
+            restapiservice.addProblem(unregisteredpostproblemdata){
+                if (it?.id != null)
+                {
+                    Toast.makeText(this@MapsActivity, "Zaznam uspesne vytvoreny", Toast.LENGTH_SHORT).show()
+                }
+                else
+                {
+                    Toast.makeText(this@MapsActivity, "Err", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
     fun getAll(map: GoogleMap) {
-        val request = ServiceBuilder.buildService(problemsAPI::class.java)
+        val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
         val call = request.getProblems()
-        call!!.enqueue(object : Callback<List<Problems?>?> {
+        call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             override fun onResponse(
-                call: Call<List<Problems?>?>,
-                response: Response<List<Problems?>?>
+                call: Call<List<ShowAllProblemsData?>?>,
+                response: Response<List<ShowAllProblemsData?>?>
             ) {
                 if (response.body() != null) {
                     Toast.makeText(this@MapsActivity, "ok", Toast.LENGTH_SHORT).show()
@@ -264,7 +265,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 }
             }
 
-            override fun onFailure(call: Call<List<Problems?>?>, t: Throwable) {
+            override fun onFailure(call: Call<List<ShowAllProblemsData?>?>, t: Throwable) {
                 Toast.makeText(applicationContext, t.message,
                     Toast.LENGTH_SHORT).show()
             }

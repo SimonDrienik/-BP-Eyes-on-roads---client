@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.math.BigInteger
 
-data class  Problems(
+data class  ShowAllProblemsData(
 
     @SerializedName("position")
     @Expose
