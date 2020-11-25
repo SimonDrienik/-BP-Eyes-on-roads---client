@@ -21,6 +21,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -177,20 +186,104 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     //pridanie markera po dlhom stlaceni screenu
     private fun setMapLongClick(map: GoogleMap) {
-
+        Log.d("TAG", "kokotko")
         map.setOnMapLongClickListener { latLng ->
             //info okno o markeru
             Locale.getDefault()
             val restapiservice = RestApiService()
+            val lat = latLng.latitude.toString().dropLast(8)
+            val lng = latLng.longitude.toString().dropLast(8)
+            val poloha = lat + "," + lng
             val unregisteredpostproblemdata = UnregisteredPostProblemData(
-                id = null,
-                poloha = "%1$.5f,%2$.5f",
+                poloha = poloha,
                 popis_problemu = description,
                 kategoria_problemu = stav_vozovky,
                 stav_problemu = stav_problemu
             )
 
-            restapiservice.addProblem(unregisteredpostproblemdata){
+
+            val request = ServiceBuilder.buildService(CallsAPI::class.java)
+
+            val jsonObject = JSONObject()
+            jsonObject.put("poloha", poloha)
+            jsonObject.put("popis_problemu", description)
+            jsonObject.put("kategoria_problemu", stav_vozovky)
+            jsonObject.put("stav_problemu", stav_problemu)
+
+            val jsonObjectString = jsonObject.toString()
+
+            val requestBody = jsonObjectString.toRequestBody("application/json".toMediaTypeOrNull())
+
+            CoroutineScope(Dispatchers.IO).launch {
+                // Do the POST request and get response
+                val response = request.addProblem1(poloha, description, stav_vozovky, stav_problemu)
+                Log.d("kurva", "pice")
+                Log.d("kurva", poloha)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+
+                        // Convert raw JSON to pretty JSON using GSON library
+                        val gson = GsonBuilder().setPrettyPrinting().create()
+                        val prettyJson = gson.toJson(
+                            JsonParser.parseString(
+                                response.body()
+                                    ?.string() // About this thread blocking annotation : https://github.com/square/retrofit/issues/3255
+                            )
+                        )
+
+                        Log.d("Pretty Printed JSON :", prettyJson)
+
+                    } else {
+
+                        Log.e("RETROFIT_ERROR", response.code().toString())
+
+                    }
+                }
+            }
+
+            /*val request = ServiceBuilder.buildService(CallsAPI::class.java)
+            val requestCall = request.addProblem1(unregisteredpostproblemdata)
+            requestCall.enqueue(object: Callback<UnregisteredPostProblemData> {
+                override fun onResponse(
+                    call: Call<UnregisteredPostProblemData>,
+                    response: Response<UnregisteredPostProblemData>
+                ) {
+                    if (response.isSuccessful){
+                        finish()
+                        Toast.makeText(this@MapsActivity, "Successfully created!", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(this@MapsActivity, "POST Failed!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<UnregisteredPostProblemData>, t: Throwable) {
+                    Toast.makeText(this@MapsActivity, "POST Failed - error!", Toast.LENGTH_SHORT).show()
+                }
+            })*/
+            Log.d("TAG", "prakokot")
+            /*request.addProblem(poloha, description, stav_vozovky, stav_problemu).enqueue(object : Callback<PostProblemResponse> {
+
+                override fun onResponse(call: Call<PostProblemResponse>, response: Response<PostProblemResponse>) {
+
+                    Log.d("TAG", "kokot")
+
+                    if (response.isSuccessful()) {
+                        Log.d("TAG", "obrkokotko")
+                        /*Log.d("TAG", "post registration to API" + response.body()!!.toString())
+                        Log.d("TAG", "post status to API" + response.body()!!.status)
+                        Log.d("TAG", "post msg to API" + response.body()!!.messages)
+                        Log.d("TAG", "post msg to API" + response.body()!!.error)
+                        Log.d("TAG", "post msg to API" + response.body()!!.errorType)*/
+
+                    }
+                }
+
+                override fun onFailure(call: Call<PostProblemResponse>, t: Throwable) {
+                    Log.d("TAG", "je to na kokot")
+                }
+            })*/
+
+            /*restapiservice.addProblem(unregisteredpostproblemdata){
                 if (it?.id != null)
                 {
                     Toast.makeText(this@MapsActivity, "Zaznam uspesne vytvoreny", Toast.LENGTH_SHORT).show()
@@ -199,7 +292,8 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 {
                     Toast.makeText(this@MapsActivity, "Err", Toast.LENGTH_SHORT).show()
                 }
-            }
+                Toast.makeText(this@MapsActivity, unregisteredpostproblemdata.poloha, Toast.LENGTH_SHORT).show()
+            }*/
         }
     }
 
@@ -235,7 +329,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                         var PopisStavuRieseniaProblemu = item!!.popis_riesenia_problemu
                         var created_at = item!!.created_at
 
-                        Toast.makeText(this@MapsActivity, "ok $i", Toast.LENGTH_SHORT).show()
+                       // Toast.makeText(this@MapsActivity, "ok $i", Toast.LENGTH_SHORT).show()
 
                         Log.d("TAG", pos1.toString())
                         Log.d("TAG", pos2.toString())
