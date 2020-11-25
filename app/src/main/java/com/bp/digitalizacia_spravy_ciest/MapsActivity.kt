@@ -21,8 +21,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,15 +53,6 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private var popis_stavu_riesenia_problemu : String = ""
     var extras : Bundle? = null
 
-
-    /*val selectedPopisStavuRieseniaProblemu: String = classNewReportActivity.popisStavuRieseniaProblemu
-    val selectedStavRieseniaProblemu: String = classNewReportActivity.stavRieseniaProblemu
-    val selectedTextSelectedStavProblemu: String = classNewReportActivity.textSelectedStavProblemu
-    var selectedTextSelectedStavVozovky: String = classNewReportActivity.textSelectedStavVozovky
-    @RequiresApi(Build.VERSION_CODES.O)
-    val selectedCurrent: LocalDateTime = LocalDateTime.now()
-    val selectedDescription: String = classNewReportActivity.description
-    var idSelected: Int = classNewReportActivity.id*/
 
     @RequiresApi(Build.VERSION_CODES.O)
      val selectedCurrent: LocalDateTime = LocalDateTime.now()
@@ -190,17 +179,9 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         map.setOnMapLongClickListener { latLng ->
             //info okno o markeru
             Locale.getDefault()
-            val restapiservice = RestApiService()
             val lat = latLng.latitude.toString().dropLast(8)
             val lng = latLng.longitude.toString().dropLast(8)
             val poloha = lat + "," + lng
-            val unregisteredpostproblemdata = UnregisteredPostProblemData(
-                poloha = poloha,
-                popis_problemu = description,
-                kategoria_problemu = stav_vozovky,
-                stav_problemu = stav_problemu
-            )
-
 
             val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
@@ -222,16 +203,20 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
 
+                        finish();
+                        startActivity(this@MapsActivity.intent);
+                        Toast.makeText(this@MapsActivity, "Zaznam uspesne vytvoreny", Toast.LENGTH_SHORT).show()
+
                         // Convert raw JSON to pretty JSON using GSON library
-                        val gson = GsonBuilder().setPrettyPrinting().create()
+                        /*val gson = GsonBuilder().setPrettyPrinting().create()
                         val prettyJson = gson.toJson(
                             JsonParser.parseString(
                                 response.body()
                                     ?.string() // About this thread blocking annotation : https://github.com/square/retrofit/issues/3255
                             )
-                        )
+                        )*/
 
-                        Log.d("Pretty Printed JSON :", prettyJson)
+                       // Log.d("Pretty Printed JSON :", prettyJson)
 
                     } else {
 
@@ -241,59 +226,9 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 }
             }
 
-            /*val request = ServiceBuilder.buildService(CallsAPI::class.java)
-            val requestCall = request.addProblem1(unregisteredpostproblemdata)
-            requestCall.enqueue(object: Callback<UnregisteredPostProblemData> {
-                override fun onResponse(
-                    call: Call<UnregisteredPostProblemData>,
-                    response: Response<UnregisteredPostProblemData>
-                ) {
-                    if (response.isSuccessful){
-                        finish()
-                        Toast.makeText(this@MapsActivity, "Successfully created!", Toast.LENGTH_SHORT).show()
-                    }else{
-                        Toast.makeText(this@MapsActivity, "POST Failed!", Toast.LENGTH_SHORT).show()
-                    }
-                }
 
-                override fun onFailure(call: Call<UnregisteredPostProblemData>, t: Throwable) {
-                    Toast.makeText(this@MapsActivity, "POST Failed - error!", Toast.LENGTH_SHORT).show()
-                }
-            })*/
             Log.d("TAG", "prakokot")
-            /*request.addProblem(poloha, description, stav_vozovky, stav_problemu).enqueue(object : Callback<PostProblemResponse> {
 
-                override fun onResponse(call: Call<PostProblemResponse>, response: Response<PostProblemResponse>) {
-
-                    Log.d("TAG", "kokot")
-
-                    if (response.isSuccessful()) {
-                        Log.d("TAG", "obrkokotko")
-                        /*Log.d("TAG", "post registration to API" + response.body()!!.toString())
-                        Log.d("TAG", "post status to API" + response.body()!!.status)
-                        Log.d("TAG", "post msg to API" + response.body()!!.messages)
-                        Log.d("TAG", "post msg to API" + response.body()!!.error)
-                        Log.d("TAG", "post msg to API" + response.body()!!.errorType)*/
-
-                    }
-                }
-
-                override fun onFailure(call: Call<PostProblemResponse>, t: Throwable) {
-                    Log.d("TAG", "je to na kokot")
-                }
-            })*/
-
-            /*restapiservice.addProblem(unregisteredpostproblemdata){
-                if (it?.id != null)
-                {
-                    Toast.makeText(this@MapsActivity, "Zaznam uspesne vytvoreny", Toast.LENGTH_SHORT).show()
-                }
-                else
-                {
-                    Toast.makeText(this@MapsActivity, "Err", Toast.LENGTH_SHORT).show()
-                }
-                Toast.makeText(this@MapsActivity, unregisteredpostproblemdata.poloha, Toast.LENGTH_SHORT).show()
-            }*/
         }
     }
 
@@ -307,7 +242,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 response: Response<List<ShowAllProblemsData?>?>
             ) {
                 if (response.body() != null) {
-                    Toast.makeText(this@MapsActivity, "ok", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapsActivity, "Zaznamy uspesne zobrazene", Toast.LENGTH_SHORT).show()
                 }
                 val problemList = response.body()
                 Log.d("TAG", "vypis")
