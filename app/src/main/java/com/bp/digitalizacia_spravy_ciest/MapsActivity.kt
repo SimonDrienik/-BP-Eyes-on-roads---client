@@ -175,7 +175,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     //pridanie markera po dlhom stlaceni screenu
     private fun setMapLongClick(map: GoogleMap) {
-        Log.d("TAG", "kokotko")
+      
         map.setOnMapLongClickListener { latLng ->
             //info okno o markeru
             Locale.getDefault()
@@ -198,8 +198,6 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             CoroutineScope(Dispatchers.IO).launch {
                 // Do the POST request and get response
                 val response = request.addProblem1(poloha, description, stav_vozovky, stav_problemu)
-                Log.d("kurva", "pice")
-                Log.d("kurva", poloha)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
 
@@ -221,13 +219,13 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     } else {
 
                         Log.e("RETROFIT_ERROR", response.code().toString())
+                        Toast.makeText(this@MapsActivity, response.code().toString(), Toast.LENGTH_SHORT).show()
 
                     }
                 }
             }
 
 
-            Log.d("TAG", "prakokot")
 
         }
     }
