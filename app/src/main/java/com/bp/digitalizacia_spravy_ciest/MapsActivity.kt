@@ -1,17 +1,20 @@
 package com.bp.digitalizacia_spravy_ciest
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -21,6 +24,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.map_activity.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,16 +40,19 @@ import java.time.LocalDateTime
 import java.util.*
 
 
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "CAST_NEVER_SUCCEEDS")
 class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-
+    //map stuff
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
 
+//  menu staff - Initialise the DrawerLayout, NavigationView and ToggleBar
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var actionBarToggle: ActionBarDrawerToggle
+    private lateinit var navView: NavigationView
 
-
-   // var classNewReportActivity = NewReportActivity()
+    //problem info stuff
     private var id : Int = 0
     private var stav_vozovky : String = ""
     private var stav_problemu : String = ""
@@ -53,15 +61,93 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private var popis_stavu_riesenia_problemu : String = ""
     var extras : Bundle? = null
 
-
     @RequiresApi(Build.VERSION_CODES.O)
      val selectedCurrent: LocalDateTime = LocalDateTime.now()
 
+    // override the onSupportNavigateUp() function to launch the Drawer when the hamburger icon is clicked
+
+
+    // override the onBackPressed() function to close the Drawer when the back button is clicked
+    /*override fun onBackPressed() {
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
+    override fun onSupportNavigateUp(): Boolean {
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            this.drawerLayout.openDrawer(GravityCompat.START)
+        }
+        return true
+    }*/
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    @SuppressLint("WrongViewCast")
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_maps)
+        setContentView(R.layout.map_activity)
+
+        /////////////////////////////MENU STUFF/////////////////////////////////
+        //hamburger for side menu drawer
+        val hamburger = findViewById<ImageView>(R.id.imageView)
+        hamburger?.setOnClickListener()
+        {
+            this.drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        // Call findViewById on the DrawerLayout
+        drawerLayout = findViewById(R.id.drawerLayout)
+
+        // Pass the ActionBarToggle action into the drawerListener
+        actionBarToggle = ActionBarDrawerToggle(this, drawerLayout, 0, 0)
+        drawerLayout.addDrawerListener(actionBarToggle)
+
+        // Display the hamburger icon to launch the drawer
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Call syncState() on the action bar so it'll automatically change to the back button when the drawer layout is open
+        actionBarToggle.syncState()
+
+        // Call findViewById on the NavigationView
+        navView = findViewById(R.id.navView)
+
+        // Call setNavigationItemSelectedListener on the NavigationView to detect when items are clicked
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.menuNastavenia -> {
+                    Toast.makeText(this, "nastavenia", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.menuMojeProblemy -> {
+                    Toast.makeText(this, "moje problemy", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.menuVsetkyProblemy -> {
+                    Toast.makeText(this, "vsetky problemy", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.menuZoznamPouzivatelov -> {
+                    Toast.makeText(this, "zoznam pouzivatelov", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.mapFragment4 -> {
+                    Intent(this, com.bp.digitalizacia_spravy_ciest.MapsActivity::class.java).apply {
+                        startActivity(this)
+                    }
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        }
+        ///////////////END OF MENU STUFF////////////////////////////////////////////
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -78,21 +164,13 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             //popis_stavu_riesenia_problemu = extras.getString("popis_stavu_riesenia_problemu").toString()
         }
 
-       // Toast.makeText(this@MapsActivity, "ok", Toast.LENGTH_SHORT).show()
-
-
-
-
-
-        val buttonNewReport = findViewById<Button>(R.id.buttonNoveHlasenie)
+        val buttonNewReport = findViewById<ImageView>(R.id.imageView3)
         buttonNewReport?.setOnClickListener()
         {
             Intent(this, NewReportActivity::class.java).apply {
                 startActivity(this)
             }
         }
-
-
     }
 
     /**
@@ -137,7 +215,6 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
-
 
     private fun setUpMap() {
         //zistime ci appka ziskala povolenie na zdielanie uzivatelovej polohy a ak nie tak poziada
@@ -203,23 +280,20 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
                         finish();
                         startActivity(this@MapsActivity.intent);
-                        Toast.makeText(this@MapsActivity, "Zaznam uspesne vytvoreny", Toast.LENGTH_SHORT).show()
-
-                        // Convert raw JSON to pretty JSON using GSON library
-                        /*val gson = GsonBuilder().setPrettyPrinting().create()
-                        val prettyJson = gson.toJson(
-                            JsonParser.parseString(
-                                response.body()
-                                    ?.string() // About this thread blocking annotation : https://github.com/square/retrofit/issues/3255
-                            )
-                        )*/
-
-                       // Log.d("Pretty Printed JSON :", prettyJson)
+                        Toast.makeText(
+                            this@MapsActivity,
+                            "Zaznam uspesne vytvoreny",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                     } else {
 
                         Log.e("RETROFIT_ERROR", response.code().toString())
-                        Toast.makeText(this@MapsActivity, response.code().toString(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@MapsActivity,
+                            response.code().toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                     }
                 }
@@ -240,7 +314,11 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 response: Response<List<ShowAllProblemsData?>?>
             ) {
                 if (response.body() != null) {
-                    Toast.makeText(this@MapsActivity, "Zaznamy uspesne zobrazene", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MapsActivity,
+                        "Zaznamy uspesne zobrazene",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 val problemList = response.body()
                 Log.d("TAG", "vypis")
@@ -254,15 +332,15 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                         var postSplit = pos?.split(",")
                         var pos1 = postSplit?.get(0)?.toDouble()
                         var pos2 = postSplit?.get(1)?.toDouble()
-                        var id_problemu =  item!!.id
+                        var id_problemu = item!!.id
                         var popis = item!!.popis
                         var kategoria = item!!.kategoria
-                        var stavRieseniaProblemu =item!!.stav_riesenia_problemu
+                        var stavRieseniaProblemu = item!!.stav_riesenia_problemu
                         var stav_problemu = item!!.stav_problemu
                         var PopisStavuRieseniaProblemu = item!!.popis_riesenia_problemu
                         var created_at = item!!.created_at
 
-                       // Toast.makeText(this@MapsActivity, "ok $i", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(this@MapsActivity, "ok $i", Toast.LENGTH_SHORT).show()
 
                         Log.d("TAG", pos1.toString())
                         Log.d("TAG", pos2.toString())
@@ -293,8 +371,10 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             }
 
             override fun onFailure(call: Call<List<ShowAllProblemsData?>?>, t: Throwable) {
-                Toast.makeText(applicationContext, t.message,
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    applicationContext, t.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
     }

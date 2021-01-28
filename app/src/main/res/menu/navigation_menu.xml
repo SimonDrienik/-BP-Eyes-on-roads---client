@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuNastavenia"
+        android:title="@string/settings"
+        android:icon="@drawable/settings"/>
+    <item
+        android:id="@+id/menuMojeProblemy"
+        android:title="@string/moje_problemy"
+        android:icon="@drawable/list"/>
+    <item
+        android:id="@+id/menuVsetkyProblemy"
+        android:title="@string/vsetky_problemy"
+        android:icon="@drawable/list"/>
+    <item
+        android:id="@+id/menuZoznamPouzivatelov"
+        android:title="@string/zoznam_pouzivatel"
+        android:icon="@drawable/users"/>
+    <item
+        android:id="@+id/mapFragment4"
+        android:title="@string/mapa_problemov"
+        android:icon="@drawable/mapa"/>
+
+    <item android:title="@string/profil1">
+        <menu>
+            <item
+                android:id="@+id/menuPrihlasenie"
+                android:title="@string/prihlasit" />
+            <item
+                android:id="@+id/menuOdhlasenie"
+                android:title="@string/odhlasit" />
+            <item
+                android:id="@+id/menuRegistracia"
+                android:title="@string/regsitracia" />
+        </menu>
+    </item>
+</menu>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Digitalizacia_spravy_ciest</string>
+    <string name="app_name">Oči na ceste</string>
     <string name="title_activity_maps">Map</string>
     <string name="dropped_pin">Droped Pin</string>
     <string name="pridanie_noveho_hlasenia_problemu">Pridanie nového hlásenia</string>
@@ -9,20 +9,33 @@
     <string name="stav_problemu">Stav problému</string>
     <string name="popis_problemu">Popis problému *</string>
     <string name="message">kliknutie uspesne</string>
+    <string name="OciNaCeste">Oči na Ceste</string>
+    <string name="NahlasProblemyNaCestach">Nahlás problémy na cestách</string>
+    <string name="profil">profil</string>
+    <string name="settings">nastavenia</string>
+    <string name="moje_problemy">Moje problemy</string>
+    <string name="vsetky_problemy">Vsetky problemy</string>
+    <string name="zoznam_pouzivatel">Zoznam pouzivatelov</string>
+    <string name="mapa_problemov">Mapa problemov</string>
 
-<string name="spinner_name">SpinnerInKotlin</string>
-<string name="selected_item">Selected item:</string>
+    <string name="spinner_name">SpinnerInKotlin</string>
+    <string name="selected_item">Selected item:</string>
 
-<string-array name="Languages">
-    <item>Stav vozovky</item>
-    <item>Dopravne znacenie</item>
-    <item>Kvalita opravy</item>
-    <item>Zelen</item>
-</string-array>
+    <string-array name="Languages">
+        <item>Stav vozovky</item>
+        <item>Dopravne znacenie</item>
+        <item>Kvalita opravy</item>
+        <item>Zelen</item>
+    </string-array>
 
     <string name="spinner2_name">SpinnerInKotlin</string>
     <string name="nove_hlasenie">Nove hlasenie</string>
     <string name="api_key">api_key</string>
+    <string name="prihlaseny">Prihlaseny</string>
+    <string name="profil1">Profil</string>
+    <string name="prihlasit">Prihlasit</string>
+    <string name="odhlasit">Odhlasit</string>
+    <string name="regsitracia">Regsitracia</string>
 
     <string-array name="stav_problemu">
         <item>Stav problemu</item>
@@ -32,4 +45,17 @@
         <item>Zle viditelna</item>
         <item>Prerastena</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_nav_drawer">NavDrawer</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
 </resources>
