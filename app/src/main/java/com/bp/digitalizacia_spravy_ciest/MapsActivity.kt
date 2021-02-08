@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.map_activity.*
+import kotlinx.android.synthetic.main.problems_list.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,7 +42,8 @@ import java.util.*
 
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "CAST_NEVER_SUCCEEDS")
-class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnInfoWindowClickListener {
     //map stuff
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -124,11 +126,13 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     true
                 }
                 R.id.menuMojeProblemy -> {
-                    Toast.makeText(this, "moje problemy", Toast.LENGTH_SHORT).show()
+                    val intent2 = Intent(this, ProblemListActivity::class.java)
+                    startActivity(intent2)
                     true
                 }
                 R.id.menuVsetkyProblemy -> {
-                    Toast.makeText(this, "vsetky problemy", Toast.LENGTH_SHORT).show()
+                    val intent2 = Intent(this, ProblemListActivity::class.java)
+                    startActivity(intent2)
                     true
                 }
                 R.id.menuZoznamPouzivatelov -> {
@@ -171,7 +175,16 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 startActivity(this)
             }
         }
+        /*map.setOnInfoWindowClickListener(object: GoogleMap.OnInfoWindowClickListener {
+            override fun onInfoWindowClick(marker:Marker) {
+            }
+        })*/
+
     }
+
+
+
+
 
     /**
      * Manipulates the map once available.
@@ -187,16 +200,25 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         val Trnava = LatLng(48.380624, 17.580751)
         map.addMarker(MarkerOptions().position(Trnava).title("Vitajte v meste Trnava"))
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(Trnava, 12.0f)) //nastavenie inintial zoom
-        map.getUiSettings().setZoomControlsEnabled(true)
+        map.getUiSettings().setZoomControlsEnabled(false)
         map.setOnMarkerClickListener(this)
         setUpMap()
         getAll(map)
         if (extras != null) {
             setMapLongClick(map)
         }
-
+        map.setOnInfoWindowClickListener(this)
         map.setInfoWindowAdapter(CustomInfoWindowForGoogleMap(this)) //pridanie noveho layoutu pre info window
        // setPoiClick(map)
+
+
+    }
+    override fun onInfoWindowClick(marker: Marker) {
+        val pozicia = marker.position
+        Toast.makeText(
+            this, "Info window clicked, $pozicia",
+            Toast.LENGTH_SHORT
+        ).show()
     }
     //pridanie zoomovania na mapke po kliknuti na marker
     class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -208,6 +230,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
 
     }
+
 
     override fun onMarkerClick(p0: Marker?) = false
 
@@ -348,14 +371,11 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                         Log.d("TAG", popis.toString())
                         val snippet = String.format(
                             Locale.getDefault(),
-                            "Position: Lat: $pos1, Long: $pos2\n " +
-                                    "id: $id_problemu\n " +
-                                    "kategoria: $kategoria\n " +
-                                    "popis: $popis\n " +
+                                    " kategoria: $kategoria\n " +
                                     "Stav Riesenia Problemu: $stavRieseniaProblemu\n " +
                                     "Stav Problemu: $stav_problemu\n " +
-                                    "popis stavu riesenia problemu: $PopisStavuRieseniaProblemu\n " +
                                     "datum: $created_at"
+
                         )
 
                         map.addMarker(
@@ -363,6 +383,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                                 .title("cestny problem")
                                 .position(LatLng(pos1!!, pos2!!))
                                 .snippet(snippet)
+
                         )
 
                         i += 1
@@ -378,6 +399,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             }
         })
     }
+
     //kliknutie na nejaky bojekt ako obchod, restauracia.... vyznaci marker s nazvom daneho objektu5y5y5y5y
     private fun setPoiClick(map: GoogleMap) {
         map.setOnPoiClickListener { poi ->
@@ -394,6 +416,8 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
 
 }
+
+
 
 
 
