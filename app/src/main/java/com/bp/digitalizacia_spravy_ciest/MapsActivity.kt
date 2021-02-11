@@ -62,6 +62,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private var description : String = ""
     private var popis_stavu_riesenia_problemu : String = ""
     var extras : Bundle? = null
+    var i : Int = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
      val selectedCurrent: LocalDateTime = LocalDateTime.now()
@@ -132,6 +133,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 }
                 R.id.menuVsetkyProblemy -> {
                     val intent2 = Intent(this, ProblemListActivity::class.java)
+                    intent2.putExtra("pocet", i)
                     startActivity(intent2)
                     true
                 }
@@ -347,7 +349,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 Log.d("TAG", "vypis")
                 //Log.i("TAG", problemList!![0]!!.poloha+"");
                 if (problemList != null) {
-                    var i = 0
+                    i = 0
 
                     for (item in problemList) {
 

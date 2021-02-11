@@ -1,19 +1,23 @@
 package com.bp.digitalizacia_spravy_ciest
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.ImageView
-import android.widget.ListView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.problems_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.math.BigInteger
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class ProblemListActivity : AppCompatActivity() {
@@ -23,10 +27,19 @@ class ProblemListActivity : AppCompatActivity() {
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var navView: NavigationView
 
+    var extras : Bundle? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.problems_list)
 
+        extras = intent.extras
+        val pocet= extras!!.getInt("pocet")
+
+        //arrays of problems in list
+        var categories = arrayOfNulls<String>(pocet)
+        var dates = arrayOfNulls<LocalDate>(pocet)
+        var IDs = arrayOfNulls<BigInteger>(pocet)
         /////////////////////////////MENU STUFF/////////////////////////////////
         //hamburger for side menu drawer
         val hamburger = findViewById<ImageView>(R.id.imageViewLP)
@@ -88,27 +101,11 @@ class ProblemListActivity : AppCompatActivity() {
         ///////////////END OF MENU STUFF////////////////////////////////////////////
 
 
-
-        getall()
-        // use arrayadapter and define an array
-        val arrayAdapter: ArrayAdapter<*>
-        val users = arrayOf(
-            "item 1", "item 2", "item 3",
-            "item 4", "item 5"
-        )
-
-        // access the listView from xml file
-        val mListView = findViewById<ListView>(R.id.problemlist)
-        arrayAdapter = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, users)
-        mListView.adapter = arrayAdapter
-    }
-
-    fun getall(){
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
         val call = request.getProblems()
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
                 call: Call<List<ShowAllProblemsData?>?>,
                 response: Response<List<ShowAllProblemsData?>?>
@@ -124,12 +121,25 @@ class ProblemListActivity : AppCompatActivity() {
                 if (problemList != null) {
                     var i = 0
                     for (item in problemList) {
-                        var id_problemu = item?.id
-                        var kategoria = item?.kategoria
-                        var created_at = item?.created_at
+                        IDs[pocet - i - 1] = item!!.id
+                        categories[pocet - i - 1] = item.kategoria
+                        dates[pocet - i - 1] = LocalDate.parse(item.created_at, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         i += 1
                     }
+
+                    Toast.makeText(
+                        this@ProblemListActivity,
+                        "tu to funguje",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+                val myListAdapter = MyListAdapter(this@ProblemListActivity, IDs, categories, dates, pocet)
+                problemlist.adapter = myListAdapter
+                Toast.makeText(
+                    this@ProblemListActivity,
+                    "aj totok",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             override fun onFailure(call: Call<List<ShowAllProblemsData?>?>, t: Throwable) {
@@ -138,6 +148,16 @@ class ProblemListActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+
         })
+
+        problemlist.setOnItemClickListener(){adapterView, view, position, id ->
+            val itemAtPos = adapterView.getItemAtPosition(position)
+            val itemIdAtPos = adapterView.getItemIdAtPosition(position)
+            Toast.makeText(this, "Click on item at $itemAtPos its item id $itemIdAtPos", Toast.LENGTH_LONG).show()
+        }
+
     }
+
+
 }
