@@ -1,7 +1,9 @@
 package com.bp.digitalizacia_spravy_ciest
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +18,11 @@ class NewReportActivity : AppCompatActivity()  {
     internal var id: Int = 0
     internal var textSelectedStavVozovky: String = ""
 
+    lateinit var buttonImg: Button
+    private val pickImage = 100
+    private var imageUri: Uri? = null
+    lateinit var imageView: ImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -26,6 +33,14 @@ class NewReportActivity : AppCompatActivity()  {
              Intent(this, MapsActivity::class.java).apply {
             startActivity(this)
             }
+        }
+
+        imageView = findViewById(R.id.imageView)
+
+        buttonImg = findViewById(R.id.buttonLoadPicture)
+        buttonImg.setOnClickListener {
+            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            startActivityForResult(gallery, pickImage)
         }
 
          editText = findViewById(R.id.description)
@@ -101,6 +116,13 @@ class NewReportActivity : AppCompatActivity()  {
                 startActivity(intent)
         }
 
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            imageUri = data?.data
+            imageView.setImageURI(imageUri)
+        }
     }
 
 }

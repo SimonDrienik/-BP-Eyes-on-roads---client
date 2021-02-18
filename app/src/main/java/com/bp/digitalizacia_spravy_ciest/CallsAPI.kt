@@ -17,5 +17,7 @@ interface CallsAPI {
                             @Path("popis_problemu") popis_problemu: String?,
                             @Path("kategoria_problemu") kategoria_problemu: String?,
                             @Path("stav_problemu") stav_problemu: String?): Response<ResponseBody>
+
+
 }
 

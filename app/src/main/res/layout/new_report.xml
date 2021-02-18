@@ -14,7 +14,7 @@
         android:id="@+id/textView"
         android:layout_width="269dp"
         android:layout_height="35dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="monospace"
         android:text="@string/pridanie_noveho_hlasenia_problemu"
         android:textAllCaps="true"
@@ -57,12 +57,12 @@
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/description"
-        android:layout_width="346dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="40dp"
+        android:layout_width="342dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="24dp"
         android:hint="@string/popis_problemu"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
+        app:layout_constraintHorizontal_bias="0.566"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner2" />
 
@@ -70,7 +70,7 @@
         android:id="@+id/spinner"
         android:layout_width="347dp"
         android:layout_height="28dp"
-        android:layout_marginTop="47dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -79,36 +79,32 @@
         android:id="@+id/spinner2"
         android:layout_width="347dp"
         android:layout_height="28dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.565"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/buttonLoadPicture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="16dp"
         android:text="@string/vybrat_foto"
         app:backgroundTint="#3EB7ED"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="146dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="6dp"
-        android:fontFamily="@font/allerta"
-        android:text="*foto vybrane"
-        android:textAllCaps="false"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="231dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        app:layout_constraintTop_toBottomOf="@+id/buttonLoadPicture"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
