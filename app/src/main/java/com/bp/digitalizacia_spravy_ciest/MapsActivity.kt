@@ -37,6 +37,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 import java.time.LocalDateTime
 import java.util.*
 
@@ -56,6 +57,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     //problem info stuff
     private var id : Int = 0
+    private lateinit var file: File
     private var stav_vozovky : String = ""
     private var stav_problemu : String = ""
     private var stav_riesenia_problemu : String = ""
@@ -63,6 +65,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private var popis_stavu_riesenia_problemu : String = ""
     var extras : Bundle? = null
     var i : Int = 0
+    private var imgId : Int = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
      val selectedCurrent: LocalDateTime = LocalDateTime.now()
@@ -162,7 +165,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         Log.d("TAG", "test1")
         extras = intent.extras
         if (null != extras) {
-            //id = extras.getInt("id")
+            imgId = extras!!.getInt("imgID")
             stav_vozovky = extras!!.getString("stav_vozovky").toString()
             stav_problemu = extras!!.getString("stav_problemu").toString()
             //stav_riesenia_problemu = extras.getString("stav_riesenia_problemu").toString()
