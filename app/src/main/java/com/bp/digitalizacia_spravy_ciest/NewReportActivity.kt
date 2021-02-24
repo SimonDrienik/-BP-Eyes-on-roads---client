@@ -211,7 +211,7 @@ class NewReportActivity : AppCompatActivity()  {
 
                     override fun onFailure(call: Call<BigInteger>, t: Throwable) {
                         Toast.makeText(
-                            applicationContext, t.message,
+                            this@NewReportActivity, "príliž veľké - MAX 2MB",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
