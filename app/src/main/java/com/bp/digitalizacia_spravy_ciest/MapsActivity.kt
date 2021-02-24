@@ -27,10 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.map_activity.*
 import kotlinx.android.synthetic.main.problems_list.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
@@ -280,7 +277,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     //pridanie markera po dlhom stlaceni screenu
     private fun setMapLongClick(map: GoogleMap) {
-      
+
         map.setOnMapLongClickListener { latLng ->
             //info okno o markeru
             Locale.getDefault()
@@ -301,10 +298,61 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
             val requestBody = jsonObjectString.toRequestBody("application/json".toMediaTypeOrNull())
 
-            CoroutineScope(Dispatchers.IO).launch {
+            val call = request.addProblem1(poloha, description, stav_vozovky, stav_problemu, imgId)
+            Log.d("TAGGGGGGGG", poloha)
+            Log.d("TAGgggggggg", description)
+            Log.d("TAG", stav_vozovky)
+            Log.d("TAG", stav_problemu)
+            Log.d("TAG", imgId.toString())
+
+            call.enqueue(object : Callback<Int> {
+                override fun onResponse(
+                    call: Call<Int>,
+                    response: Response<Int>
+                ) {
+                    if (response.body() == 1) {
+                        finish();
+                        startActivity(this@MapsActivity.intent);
+                        Toast.makeText(
+                            this@MapsActivity,
+                            "zaznam vytvoreny",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    else{
+                        Toast.makeText(
+                            this@MapsActivity,
+                            "NEJDZE",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                }
+                override fun onFailure(call: Call<Int>, t: Throwable) {
+                    Toast.makeText(
+                        applicationContext, t.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+
+
+            /*CoroutineScope(Dispatchers.IO).launch {
                 // Do the POST request and get response
-                val response = request.addProblem1(poloha, description, stav_vozovky, stav_problemu, imgId)
+
+                Log.e("INFO O PROBLEME", poloha)
+                Log.e("INFO O PROBLEME", description)
+                Log.e("INFO O PROBLEME", stav_vozovky)
+                Log.e("INFO O PROBLEME", stav_problemu)
+                Log.e("INFO O PROBLEME", imgId.toString())
                 withContext(Dispatchers.Main) {
+                    val response = request.addProblem1(
+                        poloha = poloha,
+                        popis_problemu = description,
+                        kategoria_problemu = stav_vozovky,
+                        stav_problemu = stav_problemu,
+                        imgId = imgId
+                    )
                     if (response.isSuccessful) {
 
                         finish();
@@ -326,7 +374,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
                     }
                 }
-            }
+            }*/
 
 
 
@@ -342,13 +390,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 call: Call<List<ShowAllProblemsData?>?>,
                 response: Response<List<ShowAllProblemsData?>?>
             ) {
-                if (response.body() != null) {
-                    Toast.makeText(
-                        this@MapsActivity,
-                        "Zaznamy uspesne zobrazene",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+
                 val problemList = response.body()
                 Log.d("TAG", "vypis")
                 //Log.i("TAG", problemList!![0]!!.poloha+"");

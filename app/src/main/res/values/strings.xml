@@ -24,7 +24,7 @@
     <string-array name="Languages">
         <item>Vyberte typ problemu</item>
         <item>Stav vozovky</item>
-        <item>Dopravne znacenie</item>
+        <item>Dopravné značenie</item>
         <item>Kvalita opravy</item>
         <item>Zelen</item>
     </string-array>
@@ -41,7 +41,7 @@
     <string-array name="stav_problemu">
         <item>Vyberte stav problemu</item>
         <item>Chybajuca</item>
-        <item>Poskodena</item>
+        <item>Poškodená</item>
         <item>Vyblednuta</item>
         <item>Zle viditelna</item>
         <item>Prerastena</item>

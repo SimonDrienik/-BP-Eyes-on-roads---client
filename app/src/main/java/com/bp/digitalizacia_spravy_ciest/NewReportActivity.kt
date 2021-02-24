@@ -19,7 +19,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 import java.math.BigInteger
-import java.util.*
 
 
 class NewReportActivity : AppCompatActivity()  {
@@ -56,17 +55,9 @@ class NewReportActivity : AppCompatActivity()  {
 
                 if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
 
-                    Toast.makeText(
-                        this@NewReportActivity,
-                        "permission WRITE has been deneyd by user",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 } else {
-                    Toast.makeText(
-                        this@NewReportActivity,
-                        "permision WRITE granted",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 }
             }
         }
@@ -75,17 +66,9 @@ class NewReportActivity : AppCompatActivity()  {
 
                 if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
 
-                    Toast.makeText(
-                        this@NewReportActivity,
-                        "permission READ has been deneyd by user",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 } else {
-                    Toast.makeText(
-                        this@NewReportActivity,
-                        "permision READ granted",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 }
             }
         }
@@ -127,7 +110,6 @@ class NewReportActivity : AppCompatActivity()  {
         }
 
         newID = 0.toBigInteger()
-
         imageView = findViewById(R.id.imageView)
 
         buttonImg = findViewById(R.id.buttonLoadPicture)
@@ -154,6 +136,8 @@ class NewReportActivity : AppCompatActivity()  {
                 override fun onItemSelected(parent: AdapterView<*>,
                                             view: View, position: Int, id: Long) {
 
+
+
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -176,6 +160,7 @@ class NewReportActivity : AppCompatActivity()  {
                 AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>,
                                             view: View, position: Int, id: Long) {
+
 
                 }
 
@@ -211,7 +196,7 @@ class NewReportActivity : AppCompatActivity()  {
                 val request = ServiceBuilder.buildService(CallsAPI::class.java)
                 val req = request.postImage(body, name)
                 /////////////////////////////////////
-                req!!.enqueue(object : Callback<BigInteger> {
+                req.enqueue(object : Callback<BigInteger> {
                     override fun onResponse(
                         call: Call<BigInteger>,
                         response: Response<BigInteger>
@@ -219,12 +204,6 @@ class NewReportActivity : AppCompatActivity()  {
                         if (response.body() != null) {
 
                             newID = response.body()!!
-                            val temp: String = newID.toString()
-                            Toast.makeText(
-                                this@NewReportActivity,
-                                temp,
-                                Toast.LENGTH_SHORT
-                            ).show()
                             send()
                         }
 
