@@ -65,7 +65,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private var popis_stavu_riesenia_problemu : String = ""
     var extras : Bundle? = null
     var i : Int = 0
-    private var imgId : Int = 0
+    private  var imgId : Int = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
      val selectedCurrent: LocalDateTime = LocalDateTime.now()
@@ -295,6 +295,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             jsonObject.put("popis_problemu", description)
             jsonObject.put("kategoria_problemu", stav_vozovky)
             jsonObject.put("stav_problemu", stav_problemu)
+            jsonObject.put("imgID", imgId)
 
             val jsonObjectString = jsonObject.toString()
 
@@ -302,7 +303,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
             CoroutineScope(Dispatchers.IO).launch {
                 // Do the POST request and get response
-                val response = request.addProblem1(poloha, description, stav_vozovky, stav_problemu)
+                val response = request.addProblem1(poloha, description, stav_vozovky, stav_problemu, imgId)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
 
@@ -319,7 +320,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                         Log.e("RETROFIT_ERROR", response.code().toString())
                         Toast.makeText(
                             this@MapsActivity,
-                            response.code().toString(),
+                            response.errorBody().toString(),
                             Toast.LENGTH_SHORT
                         ).show()
 

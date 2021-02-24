@@ -1,22 +1,100 @@
 package com.bp.digitalizacia_spravy_ciest
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.math.BigInteger
+import java.util.*
+
 
 class NewReportActivity : AppCompatActivity()  {
+
+    private val WRITE_REQUEST_CODE = 101
+    private val READ_REQUEST_CODE = 101
+
+    private fun setupPermissions() {
+        val permission = ContextCompat.checkSelfPermission(this,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permission2 = ContextCompat.checkSelfPermission(this,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE)
+
+        if (permission != PackageManager.PERMISSION_GRANTED || permission2 != PackageManager.PERMISSION_GRANTED) {
+            makeRequest()
+        }
+        if (permission == PackageManager.PERMISSION_GRANTED && permission2 == PackageManager.PERMISSION_GRANTED) {
+            makeRequest()
+        }
+    }
+    private fun makeRequest() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            WRITE_REQUEST_CODE)
+        ActivityCompat.requestPermissions(this,
+            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+            READ_REQUEST_CODE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            WRITE_REQUEST_CODE -> {
+
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+                    Toast.makeText(
+                        this@NewReportActivity,
+                        "permission WRITE has been deneyd by user",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this@NewReportActivity,
+                        "permision WRITE granted",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+        when (requestCode) {
+            READ_REQUEST_CODE -> {
+
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+                    Toast.makeText(
+                        this@NewReportActivity,
+                        "permission READ has been deneyd by user",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this@NewReportActivity,
+                        "permision READ granted",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+
+    companion object {
+        private const val READ_EXTERNAL_STORAGE = 1
+    }
 
     lateinit var editText: EditText
     internal var description: String = "test"
@@ -33,12 +111,13 @@ class NewReportActivity : AppCompatActivity()  {
     private var imageUri: Uri? = null
     lateinit var imageView: ImageView
     lateinit var file: File
-    internal var newID: Int = 0
+    lateinit var newID: BigInteger
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.new_report)
+        setupPermissions()
         val button = findViewById<Button>(R.id.button2)
         button?.setOnClickListener()
         {
@@ -46,6 +125,8 @@ class NewReportActivity : AppCompatActivity()  {
             startActivity(this)
             }
         }
+
+        newID = 0.toBigInteger()
 
         imageView = findViewById(R.id.imageView)
 
@@ -106,23 +187,58 @@ class NewReportActivity : AppCompatActivity()  {
         }
 
 
-
         val button3 = findViewById<Button>(R.id.button3)
         button3?.setOnClickListener()
         {
-            //upload img
-            val reqFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-            val body = MultipartBody.Part.createFormData("uploadFile", file.name, reqFile)
-            val name = "upload_test".toRequestBody("text/plain".toMediaTypeOrNull())
-
-            val request = ServiceBuilder.buildService(CallsAPI::class.java)
-            val req = request.postImage(body, name)
 
             if (imageUri == null) {
                send()
             }
             else{
-                req.enqueue(object:retrofit2.Callback<RequestBody> {
+                fun getRandomString(length: Int = 10) : String {
+                    val charset = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789"
+                    return (1..length)
+                        .map { charset.random() }
+                        .joinToString("")
+                }
+                val randomString = getRandomString()
+
+                //upload img
+                val reqFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                val body = MultipartBody.Part.createFormData("image", file.name, reqFile)
+                val name = randomString.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                val request = ServiceBuilder.buildService(CallsAPI::class.java)
+                val req = request.postImage(body, name)
+                /////////////////////////////////////
+                req!!.enqueue(object : Callback<BigInteger> {
+                    override fun onResponse(
+                        call: Call<BigInteger>,
+                        response: Response<BigInteger>
+                    ) {
+                        if (response.body() != null) {
+
+                            newID = response.body()!!
+                            val temp: String = newID.toString()
+                            Toast.makeText(
+                                this@NewReportActivity,
+                                temp,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            send()
+                        }
+
+                    }
+
+                    override fun onFailure(call: Call<BigInteger>, t: Throwable) {
+                        Toast.makeText(
+                            applicationContext, t.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
+                /////////////////////////////////////
+                /*req.enqueue(object:retrofit2.Callback<RequestBody> {
                     override fun onResponse(call: Call<RequestBody>, response: Response<RequestBody>) {
                         if (response.code() > 0) {
                             Toast.makeText(
@@ -131,18 +247,18 @@ class NewReportActivity : AppCompatActivity()  {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        newID = response.code()
+                        newID = response.code().toInt()
                         send()
                     }
 
                     override fun onFailure(call: Call<RequestBody>, t: Throwable) {
                         Toast.makeText(
                             this@NewReportActivity,
-                            "Err!",
+                            response.code().toString(),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                })
+                })*/
             }
 
             
@@ -165,7 +281,7 @@ class NewReportActivity : AppCompatActivity()  {
             Toast.makeText(this, "Vyberte na mape miesto dlhym klikom", Toast.LENGTH_LONG)
                 .show()
         val intent = Intent(this, MapsActivity::class.java)
-        intent.putExtra("imgID", newID)
+        intent.putExtra("imgID", newID.toInt())
         intent.putExtra("stav_vozovky", textSelectedStavVozovky)
         intent.putExtra("stav_problemu", textSelectedStavProblemu)
         intent.putExtra("description", description)
