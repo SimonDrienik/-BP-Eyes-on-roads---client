@@ -1,4 +1,4 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.models
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName

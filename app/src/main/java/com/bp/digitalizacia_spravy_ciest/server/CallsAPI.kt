@@ -1,11 +1,13 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.server
 
+import com.bp.digitalizacia_spravy_ciest.models.LoginRequest
+import com.bp.digitalizacia_spravy_ciest.models.LoginResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*
 import java.math.BigInteger
-import com.bp.digitalizacia_spravy_ciest.ShowAllProblemsData as Problems1
+import com.bp.digitalizacia_spravy_ciest.models.ShowAllProblemsData as Problems1
 
 
 interface CallsAPI {
@@ -22,5 +24,8 @@ interface CallsAPI {
     @Multipart
     @POST("/uploadProblemImage")
     fun postImage(@Part image: MultipartBody.Part, @Part("name") name: RequestBody): Call<BigInteger>
+
+    @POST("/api/loginAndroid")
+    fun login(@Body request: LoginRequest): Call<LoginResponse>
 }
 

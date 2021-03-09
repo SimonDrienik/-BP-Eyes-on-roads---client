@@ -1,9 +1,10 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
+import com.bp.digitalizacia_spravy_ciest.R
 
 
 class SplashActivity : AppCompatActivity(){
@@ -18,7 +19,7 @@ class SplashActivity : AppCompatActivity(){
             // This method will be executed once the timer is over
             // Start your app main activity
 
-            startActivity(Intent(this,MapsActivity::class.java))
+            startActivity(Intent(this, MapsActivity::class.java))
 
             // close this activity
             finish()

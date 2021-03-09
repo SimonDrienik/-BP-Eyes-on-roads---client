@@ -1,4 +1,4 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import com.bp.digitalizacia_spravy_ciest.R
 import java.math.BigInteger
 import java.time.LocalDate
 

@@ -1,4 +1,4 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -15,6 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.bp.digitalizacia_spravy_ciest.R
+import com.bp.digitalizacia_spravy_ciest.models.ShowAllProblemsData
+import com.bp.digitalizacia_spravy_ciest.server.CallsAPI
+import com.bp.digitalizacia_spravy_ciest.server.ServiceBuilder
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -142,7 +146,13 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     true
                 }
                 R.id.mapFragment4 -> {
-                    Intent(this, com.bp.digitalizacia_spravy_ciest.MapsActivity::class.java).apply {
+                    Intent(this, com.bp.digitalizacia_spravy_ciest.ui.MapsActivity::class.java).apply {
+                        startActivity(this)
+                    }
+                    true
+                }
+                R.id.menuPrihlasenie -> {
+                    Intent(this, LoginActivity::class.java).apply {
                         startActivity(this)
                     }
                     true

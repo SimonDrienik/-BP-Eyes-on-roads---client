@@ -1,15 +1,20 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bp.digitalizacia_spravy_ciest.R
+import com.bp.digitalizacia_spravy_ciest.server.CallsAPI
+import com.bp.digitalizacia_spravy_ciest.server.ServiceBuilder
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -19,6 +24,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 import java.math.BigInteger
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class NewReportActivity : AppCompatActivity()  {
@@ -96,6 +103,7 @@ class NewReportActivity : AppCompatActivity()  {
     lateinit var file: File
     lateinit var newID: BigInteger
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -186,7 +194,10 @@ class NewReportActivity : AppCompatActivity()  {
                         .map { charset.random() }
                         .joinToString("")
                 }
-                val randomString = getRandomString()
+                val current = LocalDateTime.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val formatted = current.format(formatter).toString()
+                val randomString = getRandomString() + formatted
 
                 //upload img
                 val reqFile = file.asRequestBody("image/*".toMediaTypeOrNull())

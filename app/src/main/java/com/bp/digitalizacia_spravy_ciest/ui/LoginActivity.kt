@@ -1,45 +1,46 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.bp.digitalizacia_spravy_ciest.R
+import com.bp.digitalizacia_spravy_ciest.models.LoginRequest
+import com.bp.digitalizacia_spravy_ciest.models.LoginResponse
+import com.bp.digitalizacia_spravy_ciest.models.User
+import com.bp.digitalizacia_spravy_ciest.server.CallsAPI
+import com.bp.digitalizacia_spravy_ciest.server.ServiceBuilder
+import com.bp.digitalizacia_spravy_ciest.utils.SessionManager
 import com.google.android.material.navigation.NavigationView
-import kotlinx.android.synthetic.main.problems_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.math.BigInteger
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
 
-class ProblemListActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
+
+    private lateinit var sessionManager: SessionManager
+    private lateinit var apiClient: ServiceBuilder
+    private  var email: String = ""
+    private  var pswd: String = ""
 
     //  menu staff - Initialise the DrawerLayout, NavigationView and ToggleBar
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var navView: NavigationView
 
-    var extras : Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.problems_list)
+        setContentView(R.layout.login_activity)
 
-        extras = intent.extras
-        val pocet= extras!!.getInt("pocet")
 
-        //arrays of problems in list
-        var categories = arrayOfNulls<String>(pocet)
-        var dates = arrayOfNulls<LocalDate>(pocet)
-        var IDs = arrayOfNulls<BigInteger>(pocet)
         /////////////////////////////MENU STUFF/////////////////////////////////
         //hamburger for side menu drawer
         val hamburger = findViewById<ImageView>(R.id.imageViewLP)
@@ -100,64 +101,57 @@ class ProblemListActivity : AppCompatActivity() {
         }
         ///////////////END OF MENU STUFF////////////////////////////////////////////
 
+        var et_user_name = findViewById(R.id.et_user_name) as EditText
+        var et_password = findViewById(R.id.et_password) as EditText
+        var btn_reset = findViewById(R.id.btn_reset) as Button
+        var btn_submit = findViewById(R.id.btn_submit) as Button
 
-        val request = ServiceBuilder.buildService(CallsAPI::class.java)
+        btn_reset.setOnClickListener{
+            email = et_user_name.text.toString()
+            pswd = et_password.text.toString()
+            Toast.makeText(this@LoginActivity, pswd, Toast.LENGTH_LONG).show()
+            /*et_user_name.setText("")
+            et_password.setText("")*/
+        }
 
-        val call = request.getProblems()
-        call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onResponse(
-                call: Call<List<ShowAllProblemsData?>?>,
-                response: Response<List<ShowAllProblemsData?>?>
-            ) {
-                if (response.body() != null) {
-                    Toast.makeText(
-                        this@ProblemListActivity,
-                        "Zaznamy uspesne zobrazene",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                val problemList = response.body()
-                if (problemList != null) {
-                    var i = 0
-                    for (item in problemList) {
-                        IDs[pocet - i - 1] = item!!.id
-                        categories[pocet - i - 1] = item.kategoria
-                        dates[pocet - i - 1] = LocalDate.parse(item.created_at, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        i += 1
+        btn_submit.setOnClickListener {
+
+            apiClient = ServiceBuilder
+            sessionManager = SessionManager(this)
+
+            val request = ServiceBuilder.buildService(CallsAPI::class.java)
+
+            email = et_user_name.text.toString()
+            pswd = et_password.text.toString()
+            val userData = LoginRequest(email, pswd)
+
+            request.login(userData)
+                .enqueue(object : Callback<LoginResponse> {
+                    override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                        Toast.makeText(
+                            applicationContext, t.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
-                    Toast.makeText(
-                        this@ProblemListActivity,
-                        "tu to funguje",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                val myListAdapter = MyListAdapter(this@ProblemListActivity, IDs, categories, dates, pocet)
-                problemlist.adapter = myListAdapter
-                Toast.makeText(
-                    this@ProblemListActivity,
-                    "aj totok",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+                    override fun onResponse(
+                        call: Call<LoginResponse>,
+                        response: Response<LoginResponse>
+                    ) {
+                        val loginResponse = response.body()
 
-            override fun onFailure(call: Call<List<ShowAllProblemsData?>?>, t: Throwable) {
-                Toast.makeText(
-                    applicationContext, t.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-        })
-
-        problemlist.setOnItemClickListener(){adapterView, view, position, id ->
-            val itemAtPos = adapterView.getItemAtPosition(position)
-            val itemIdAtPos = adapterView.getItemIdAtPosition(position)
-            Toast.makeText(this, "Click on item at $itemAtPos its item id $itemIdAtPos", Toast.LENGTH_LONG).show()
+                        if (loginResponse?.statusCode == 200 || loginResponse?.user != null) {
+                            sessionManager.saveAuthToken(loginResponse.authToken)
+                            Log.d("LOGIN USER------->>>>", loginResponse.authToken)
+                            Log.d("name user------->>>>", User.getInstance().name)
+                        } else {
+                            Log.d("LOGIN USER------->>>>", "DACO MI TU NEHRAJE")
+                            Log.d("LOGIN USER------->>>>", response.body().toString())
+                            Log.d("LOGIN USER------->>>>", userData.email)
+                        }
+                    }
+                })
         }
 
     }
-
-
 }

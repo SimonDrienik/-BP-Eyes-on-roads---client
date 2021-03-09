@@ -1,5 +1,7 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.server
 
+import android.content.Context
+import com.bp.digitalizacia_spravy_ciest.utils.AuthInterceptor
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -22,6 +24,12 @@ object ServiceBuilder {
 
     fun <T> buildService(service: Class<T>): T{
         return retrofit.create(service)
+    }
+    //adding interceptor for token auth.. not used
+    private fun okhttpClient(context: Context): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(context))
+            .build()
     }
 
 }

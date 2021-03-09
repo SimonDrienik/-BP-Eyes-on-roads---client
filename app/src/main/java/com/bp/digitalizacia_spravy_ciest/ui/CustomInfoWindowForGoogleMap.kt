@@ -1,9 +1,10 @@
-package com.bp.digitalizacia_spravy_ciest
+package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.widget.TextView
+import com.bp.digitalizacia_spravy_ciest.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 

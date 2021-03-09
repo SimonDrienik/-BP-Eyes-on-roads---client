@@ -41,11 +41,11 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".NewReportActivity"
+            android:name=".ui.NewReportActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".ui.SplashActivity"
             android:label="@string/OciNaCeste"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -56,12 +56,17 @@
         </activity>
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".ui.MapsActivity"
             android:label="@string/OciNaCeste"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ProblemListActivity"
+            android:name=".ui.ProblemListActivity"
+            android:label="@string/OciNaCeste"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.LoginActivity"
             android:label="@string/OciNaCeste"
             android:screenOrientation="portrait" />
 
