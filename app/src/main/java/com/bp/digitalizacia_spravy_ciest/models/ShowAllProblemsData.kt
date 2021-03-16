@@ -36,6 +36,10 @@ data class  ShowAllProblemsData(
 
     @SerializedName("created_at")
     @Expose
-    var created_at: String
+    var created_at: String,
+
+    @SerializedName("pouzivatel")
+    @Expose
+    var pouzivatel: BigInteger
 
     )

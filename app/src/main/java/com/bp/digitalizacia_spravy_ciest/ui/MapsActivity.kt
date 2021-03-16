@@ -8,10 +8,13 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.SubMenu
+import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.solver.widgets.analyzer.WidgetGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -19,6 +22,7 @@ import com.bp.digitalizacia_spravy_ciest.R
 import com.bp.digitalizacia_spravy_ciest.models.ShowAllProblemsData
 import com.bp.digitalizacia_spravy_ciest.server.CallsAPI
 import com.bp.digitalizacia_spravy_ciest.server.ServiceBuilder
+import com.bp.digitalizacia_spravy_ciest.utils.SessionManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.layout_navigation_header.view.*
 import kotlinx.android.synthetic.main.map_activity.*
 import kotlinx.android.synthetic.main.problems_list.*
 import kotlinx.coroutines.*
@@ -55,6 +60,9 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var navView: NavigationView
+    private lateinit var navHeader: WidgetGroup
+    private lateinit var sessionManager: SessionManager
+    private lateinit var submenu: SubMenu
 
     //problem info stuff
     private var id : Int = 0
@@ -122,7 +130,6 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
         // Call findViewById on the NavigationView
         navView = findViewById(R.id.navView)
-
         // Call setNavigationItemSelectedListener on the NavigationView to detect when items are clicked
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
@@ -132,12 +139,13 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 }
                 R.id.menuMojeProblemy -> {
                     val intent2 = Intent(this, ProblemListActivity::class.java)
+                    intent2.putExtra("allProblems", 0)
                     startActivity(intent2)
                     true
                 }
                 R.id.menuVsetkyProblemy -> {
                     val intent2 = Intent(this, ProblemListActivity::class.java)
-                    intent2.putExtra("pocet", i)
+                    intent2.putExtra("allProblems", 1)
                     startActivity(intent2)
                     true
                 }
@@ -157,11 +165,64 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     }
                     true
                 }
+                R.id.menuRegistracia -> {
+                    Toast.makeText(this, "registracia", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.menuOdhlasenie -> {
+                    sessionManager.clear()
+                    Intent(this, com.bp.digitalizacia_spravy_ciest.ui.MapsActivity::class.java).apply {
+                        startActivity(this)
+                    }
+                    true
+                }
                 else -> {
                     false
                 }
             }
         }
+
+        sessionManager = SessionManager(this)
+        //Actual user info
+        val header = navView.getHeaderView(0)
+        header.userName.text = sessionManager.fetchUserName().toString()
+
+        //menu for unregistered user, role_id == 2
+        if (sessionManager.fetchUserId() == null) {
+            header.prihlaseny.visibility = View.GONE
+            navView.menu.getItem(0).isVisible = false
+            navView.menu.getItem(1).isVisible = false
+            navView.menu.getItem(3).isVisible = false
+            navView.menu.getItem(5).subMenu.getItem(1).isVisible = false
+        }
+
+        //menu for registred public user, role_id == 1
+        if (sessionManager.fetchUserRoleId() == "1") {
+            navView.menu.getItem(0).isVisible = false
+            navView.menu.getItem(3).isVisible = false
+            navView.menu.getItem(5).subMenu.getItem(0).isVisible = false
+            navView.menu.getItem(5).subMenu.getItem(2).isVisible = false
+        }
+
+        //menu for Administrator, role_id == 3
+        if (sessionManager.fetchUserRoleId() == "3") {
+            navView.menu.getItem(0).isVisible = false
+            navView.menu.getItem(1).isVisible = false
+            navView.menu.getItem(5).subMenu.getItem(0).isVisible = false
+            navView.menu.getItem(5).subMenu.getItem(2).isVisible = false
+        }
+
+        //menu for dispatcher, role_id == 4 or manager, role_id == 5
+        if (sessionManager.fetchUserRoleId() == "4" || sessionManager.fetchUserRoleId() == "5") {
+            navView.menu.getItem(0).isVisible = false
+            navView.menu.getItem(1).isVisible = false
+            navView.menu.getItem(3).isVisible = false
+            navView.menu.getItem(5).subMenu.getItem(0).isVisible = false
+            navView.menu.getItem(5).subMenu.getItem(2).isVisible = false
+        }
+
+
+
         ///////////////END OF MENU STUFF////////////////////////////////////////////
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -306,9 +367,17 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
             val jsonObjectString = jsonObject.toString()
 
+            var idOfUser = 0
+
+            if (sessionManager.fetchUserId() == null)
+                idOfUser = 1
+            else
+                idOfUser = sessionManager.fetchUserId()!!.toInt()
+
+
             val requestBody = jsonObjectString.toRequestBody("application/json".toMediaTypeOrNull())
 
-            val call = request.addProblem1(poloha, description, stav_vozovky, stav_problemu, imgId)
+            val call = request.addProblem1(poloha, description, stav_vozovky, stav_problemu, imgId, idOfUser)
             Log.d("TAGGGGGGGG", poloha)
             Log.d("TAGgggggggg", description)
             Log.d("TAG", stav_vozovky)

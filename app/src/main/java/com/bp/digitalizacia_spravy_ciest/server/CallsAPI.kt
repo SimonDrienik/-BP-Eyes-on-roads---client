@@ -14,12 +14,13 @@ interface CallsAPI {
     @GET("/showAllAndroid")
     fun getProblems() : Call<List<Problems1?>?>?
 
-    @GET("/unregisteredPostAndroid/{poloha}/{popis_problemu}/{kategoria_problemu}/{stav_problemu}/{imgId}")
+    @GET("/unregisteredPostAndroid/{poloha}/{popis_problemu}/{kategoria_problemu}/{stav_problemu}/{imgId}/{idOfUser}")
     fun addProblem1(@Path("poloha") poloha: String?,
                             @Path("popis_problemu") popis_problemu: String?,
                             @Path("kategoria_problemu") kategoria_problemu: String?,
                             @Path("stav_problemu") stav_problemu: String?,
-                            @Path("imgId") imgId: Int?): Call<Int>
+                            @Path("imgId") imgId: Int?,
+                            @Path("idOfUser") idOfUser: Int?): Call<Int>
 
     @Multipart
     @POST("/uploadProblemImage")
