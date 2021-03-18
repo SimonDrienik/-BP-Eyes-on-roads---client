@@ -70,6 +70,12 @@
             android:label="@string/OciNaCeste"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".ui.DetailActivity"
+            android:label="@string/OciNaCeste"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize"/>
+
     </application>
 
 </manifest>

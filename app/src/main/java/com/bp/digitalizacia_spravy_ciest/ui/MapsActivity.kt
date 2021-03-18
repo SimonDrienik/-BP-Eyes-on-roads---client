@@ -292,6 +292,12 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             this, "Info window clicked, $pozicia",
             Toast.LENGTH_SHORT
         ).show()
+        val id = marker.title.toInt()
+        Intent(this, DetailActivity::class.java).apply {
+            putExtra("problemID", id)
+            startActivity(this)
+        }
+
     }
     //pridanie zoomovania na mapke po kliknuti na marker
     class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -463,7 +469,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     fun getAll(map: GoogleMap) {
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems()
+        val call = request.getProblems(0)
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             override fun onResponse(
                 call: Call<List<ShowAllProblemsData?>?>,
@@ -507,9 +513,10 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
                         map.addMarker(
                             MarkerOptions()
-                                .title("cestny problem")
+                                .title(id_problemu.toString())
                                 .position(LatLng(pos1!!, pos2!!))
                                 .snippet(snippet)
+
 
                         )
 

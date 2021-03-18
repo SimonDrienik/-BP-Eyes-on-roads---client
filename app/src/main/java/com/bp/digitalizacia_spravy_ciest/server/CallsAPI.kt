@@ -2,6 +2,7 @@ package com.bp.digitalizacia_spravy_ciest.server
 
 import com.bp.digitalizacia_spravy_ciest.models.LoginRequest
 import com.bp.digitalizacia_spravy_ciest.models.LoginResponse
+import com.bp.digitalizacia_spravy_ciest.models.Spinners
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -11,8 +12,8 @@ import com.bp.digitalizacia_spravy_ciest.models.ShowAllProblemsData as Problems1
 
 
 interface CallsAPI {
-    @GET("/showAllAndroid")
-    fun getProblems() : Call<List<Problems1?>?>?
+    @GET("/showAllAndroid/{x}")
+    fun getProblems(@Path("x") x: Int?) : Call<List<Problems1?>?>?
 
     @GET("/unregisteredPostAndroid/{poloha}/{popis_problemu}/{kategoria_problemu}/{stav_problemu}/{imgId}/{idOfUser}")
     fun addProblem1(@Path("poloha") poloha: String?,
@@ -28,5 +29,8 @@ interface CallsAPI {
 
     @POST("/api/loginAndroid")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
+
+    @GET("/spinners")
+    fun getSpinners() : Call<List<Spinners>>
 }
 

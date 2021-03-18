@@ -40,6 +40,22 @@ data class  ShowAllProblemsData(
 
     @SerializedName("pouzivatel")
     @Expose
-    var pouzivatel: BigInteger
+    var pouzivatel: BigInteger,
+
+    @SerializedName("priradeny_zamestnanec")
+    @Expose
+    var zamestnanec: String,
+
+    @SerializedName("priorita")
+    @Expose
+    var priorita: String,
+
+    @SerializedName("priradene_vozidlo")
+    @Expose
+    var vozidlo: String,
+
+    @SerializedName("pouzivatel_meno")
+    @Expose
+    var pouzivatel_meno: String
 
     )

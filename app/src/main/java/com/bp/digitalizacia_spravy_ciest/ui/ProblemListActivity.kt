@@ -167,7 +167,7 @@ class ProblemListActivity : AppCompatActivity() {
 
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems()
+        val call = request.getProblems(0)
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
