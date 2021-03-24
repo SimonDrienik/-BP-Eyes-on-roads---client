@@ -287,14 +287,10 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
     }
     override fun onInfoWindowClick(marker: Marker) {
-        val pozicia = marker.position
-        Toast.makeText(
-            this, "Info window clicked, $pozicia",
-            Toast.LENGTH_SHORT
-        ).show()
         val id = marker.title.toInt()
         Intent(this, DetailActivity::class.java).apply {
             putExtra("problemID", id)
+            putExtra("from", 3)
             startActivity(this)
         }
 
@@ -384,12 +380,6 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             val requestBody = jsonObjectString.toRequestBody("application/json".toMediaTypeOrNull())
 
             val call = request.addProblem1(poloha, description, stav_vozovky, stav_problemu, imgId, idOfUser)
-            Log.d("TAGGGGGGGG", poloha)
-            Log.d("TAGgggggggg", description)
-            Log.d("TAG", stav_vozovky)
-            Log.d("TAG", stav_problemu)
-            Log.d("TAG", imgId.toString())
-
             call.enqueue(object : Callback<Int> {
                 override fun onResponse(
                     call: Call<Int>,

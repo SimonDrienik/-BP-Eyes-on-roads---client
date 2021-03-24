@@ -1,28 +1,105 @@
 package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.R.layout.simple_spinner_item
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bp.digitalizacia_spravy_ciest.R
-import com.bp.digitalizacia_spravy_ciest.models.ShowAllProblemsData
-import com.bp.digitalizacia_spravy_ciest.models.Spinners
+import com.bp.digitalizacia_spravy_ciest.models.*
 import com.bp.digitalizacia_spravy_ciest.server.CallsAPI
 import com.bp.digitalizacia_spravy_ciest.server.ServiceBuilder
 import com.bp.digitalizacia_spravy_ciest.utils.SessionManager
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.custom_list.*
 import kotlinx.android.synthetic.main.layout_navigation_header.view.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class DetailActivity : AppCompatActivity() {
+    //choose img from lib
+    private val WRITE_REQUEST_CODE = 101
+    private val READ_REQUEST_CODE = 101
+
+    private fun setupPermissions() {
+        val permission = ContextCompat.checkSelfPermission(this,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permission2 = ContextCompat.checkSelfPermission(this,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE)
+
+        if (permission != PackageManager.PERMISSION_GRANTED || permission2 != PackageManager.PERMISSION_GRANTED) {
+            makeRequest()
+        }
+        if (permission == PackageManager.PERMISSION_GRANTED && permission2 == PackageManager.PERMISSION_GRANTED) {
+            makeRequest()
+        }
+    }
+    private fun makeRequest() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            WRITE_REQUEST_CODE)
+        ActivityCompat.requestPermissions(this,
+            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+            READ_REQUEST_CODE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            WRITE_REQUEST_CODE -> {
+
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+
+                } else {
+
+                }
+            }
+        }
+        when (requestCode) {
+            READ_REQUEST_CODE -> {
+
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+
+                } else {
+
+                }
+            }
+        }
+    }
+
+
+    companion object {
+        private const val READ_EXTERNAL_STORAGE = 1
+    }
+
+
+
     //  menu staff - Initialise the DrawerLayout, NavigationView and ToggleBar
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var actionBarToggle: ActionBarDrawerToggle
@@ -32,6 +109,7 @@ class DetailActivity : AppCompatActivity() {
     var extras : Bundle? = null
     private var idProblem : Int = 0
     var loged = 0
+    private var from : Int = 0
 
     private var datum : String = ""
     private var vytvoril : String = ""
@@ -44,6 +122,9 @@ class DetailActivity : AppCompatActivity() {
     private var stavRiesenia : String = ""
     private var vozidlo : String = ""
     private var popisRiesenia : String = ""
+
+    private var imgProblemUrl : String = ""
+    private var imgRiesenieUrl : String = ""
 
     private lateinit var zamestnanci : List<String>
     private lateinit var priority : List<String>
@@ -59,7 +140,23 @@ class DetailActivity : AppCompatActivity() {
     lateinit var spinnerVozidlo: Spinner
     lateinit var spinnerStavRieseniaProblemu: Spinner
 
+    //img
+    private val pickImage = 100
+    private var imageUri: Uri? = null
+    lateinit var imageView: ImageView
+    lateinit var file: File
 
+    private var zamestnanecChange = ""
+    private var prioritaChange = ""
+    private var kategoriaChange = ""
+    private var stavChange = ""
+    private var stavRieseniaChange = ""
+    private var priradeneVozidloChange = ""
+    private var opisRieseniaChange: String = ""
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.detail_activity)
@@ -185,8 +282,311 @@ class DetailActivity : AppCompatActivity() {
         extras = intent.extras
         if (null != extras) {
             idProblem = extras!!.getInt("problemID")
+            from = extras!!.getInt("from")
         }
         getAll()
+        if (from == 1)
+            findViewById<Button>(R.id.zrusitButton).setOnClickListener {
+                Intent(this, ProblemListActivity::class.java).apply {
+                    putExtra("allProblems", 1)
+                    startActivity(this)
+                }
+            }
+        if (from == 0)
+            findViewById<Button>(R.id.zrusitButton).setOnClickListener {
+                Intent(this, ProblemListActivity::class.java).apply {
+                    putExtra("allProblems", 0)
+                    startActivity(this)
+                }
+            }
+        if (from == 3)
+            findViewById<Button>(R.id.zrusitButton).setOnClickListener {
+                Intent(this, MapsActivity::class.java).apply {
+                    startActivity(this)
+                }
+            }
+
+        imageView = findViewById(R.id.fotoRiesenia)
+        findViewById<Button>(R.id.fotoButton).setOnClickListener {
+            val intent = Intent()
+            intent.type = "image/*"
+            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            startActivityForResult(gallery, pickImage)
+        }
+
+        //delete problem and all asociations //idProblem
+        findViewById<Button>(R.id.deleteButton).setOnClickListener {
+
+            val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+            //set title for alert dialog
+            builder.setTitle("Potvrďte vymazanie")
+            //set message for alert dialog
+            builder.setMessage("Naozaj chcete natrvalo odstrániť problém?")
+            builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+            //performing positive action
+            builder.setPositiveButton(R.string.Yes){dialogInterface, which ->
+                // Delete selected note from database
+
+                val deleteRequest = DeleteRequest(sessionManager.fetchAuthToken().toString(), idProblem)
+                val request = ServiceBuilder.buildService(CallsAPI::class.java)
+                val call =
+                    request.delete(deleteRequest)
+
+                call.enqueue(object : Callback<Int> {
+                    override fun onResponse(
+                        call: Call<Int>,
+                        response: Response<Int>
+                    ) {
+                        val suc = response.body()
+                        if (suc == 1)
+                            Toast.makeText(
+                                this@DetailActivity,
+                                "Uspesne vymazane",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        else
+                            Toast.makeText(
+                                this@DetailActivity,
+                                "Ups, something went wrong!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                    }
+
+                    override fun onFailure(call: Call<Int>, t: Throwable) {
+                        Toast.makeText(
+                            applicationContext, t.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
+
+
+            }
+            //performing cancel action
+            builder.setNeutralButton("Cancel"){dialogInterface , which ->
+                dialogInterface.dismiss()
+            }
+            //performing negative action
+            val x = builder.setNegativeButton("Nie"){ dialogInterface, which ->
+                dialogInterface.dismiss()
+            }
+            x.show()
+            // Create the AlertDialog
+            val alertDialog: AlertDialog = builder.create()
+            // Set other dialog properties
+            alertDialog.setCancelable(false)
+            alertDialog.show()
+
+
+        }
+
+        //aktualizacia problemu
+        findViewById<Button>(R.id.potvrditButton).setOnClickListener {
+            //kontrola zmenenych udajov zamestnanc
+            if (zamestnanec != spinnerZamestnanec.selectedItem.toString())
+                zamestnanecChange = spinnerZamestnanec.selectedItem.toString()
+            else
+                zamestnanecChange = "n"
+
+            //kontrola zmenenych udajov priorita
+            if (priorita != spinnerPriorita.selectedItem.toString())
+                prioritaChange = spinnerPriorita.selectedItem.toString()
+            else
+                prioritaChange = "n"
+
+            //kontrola zmenenych udajov kategoria
+            if (kategoria != spinnerKategoria.selectedItem.toString())
+                kategoriaChange = spinnerKategoria.selectedItem.toString()
+            else
+                kategoriaChange = "n"
+
+            //kontrola zmenenych udajov stav
+            if (stavProblemu != spinnerStavProblemu.selectedItem.toString())
+                stavChange = spinnerStavProblemu.selectedItem.toString()
+            else
+                stavChange = "n"
+
+            //kontrola zmenenych udajov stavRiesenia
+            if (stavRiesenia != spinnerStavRieseniaProblemu.selectedItem.toString())
+                stavRieseniaChange = spinnerStavRieseniaProblemu.selectedItem.toString()
+            else
+                stavRieseniaChange = "n"
+
+            //kontrola zmenenych udajov priradene vozidlo
+            if (vozidlo != spinnerVozidlo.selectedItem.toString())
+                priradeneVozidloChange = spinnerVozidlo.selectedItem.toString()
+            else
+                priradeneVozidloChange = "n"
+
+            //kontrola zmenenych udajov opis Riesenia
+            if (popisRiesenia != findViewById<TextInputEditText>(R.id.poznmkaField).text.toString())
+                opisRieseniaChange = findViewById<TextInputEditText>(R.id.poznmkaField).text.toString()
+            else
+                opisRieseniaChange = "n"
+
+
+            Toast.makeText(
+                this@DetailActivity, "Loading...",
+                Toast.LENGTH_LONG
+            ).show()
+
+            send()
+
+        }
+
+    }
+
+    fun refresh()
+    {
+        Intent(this, DetailActivity::class.java).apply {
+            putExtra("problemID", idProblem)
+            putExtra("from", from)
+            startActivity(this)
+        }
+    }
+
+    fun send()
+    {
+        val request = ServiceBuilder.buildService(CallsAPI::class.java)
+        val call = request.editProblem(EditProblem(zamestnanecChange, prioritaChange,
+            kategoriaChange, stavChange, stavRieseniaChange, priradeneVozidloChange, opisRieseniaChange, sessionManager.fetchAuthToken().toString(), problemID = idProblem))
+        call.enqueue(object : Callback<Int> {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onResponse(
+                call: Call<Int>,
+                response: Response<Int>
+            ) {
+                if (response.body() != -1) {
+                    if (imageUri != null && opisRieseniaChange != "n")
+                        uploadRiesenieImg(response.body())
+                    if (imageUri != null && opisRieseniaChange == "n")
+                    {
+                        val builder = AlertDialog.Builder(this@DetailActivity, R.style.AlertDialogTheme)
+                        //set title for alert dialog
+                        builder.setTitle("Takto nie...")
+                        //set message for alert dialog
+                        builder.setMessage("Pre pridanie fotky riešenia, prosím pridajte poznamku k riešeniu")
+                        builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+                        //performing cancel action
+                        builder.setNeutralButton("Ok"){dialogInterface , which ->
+                            dialogInterface.dismiss()
+                        }
+                        // Create the AlertDialog
+                        val alertDialog: AlertDialog = builder.create()
+                        // Set other dialog properties
+                        alertDialog.setCancelable(false)
+                        alertDialog.show()
+                    }
+                    if (imageUri == null)
+                    {
+                        refresh()
+                    }
+                }
+                else{
+                    val builder = AlertDialog.Builder(this@DetailActivity, R.style.AlertDialogTheme)
+                    //set title for alert dialog
+                    builder.setTitle("HUUPS...")
+                    //set message for alert dialog
+                    builder.setMessage("Aktualizácia problému zlyhala... skúste prosim znovu")
+                    builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+                    //performing cancel action
+                    builder.setNeutralButton("Ok"){dialogInterface , which ->
+                        dialogInterface.dismiss()
+                    }
+                    // Create the AlertDialog
+                    val alertDialog: AlertDialog = builder.create()
+                    // Set other dialog properties
+                    alertDialog.setCancelable(false)
+                    alertDialog.show()
+                }
+
+            }
+            override fun onFailure(call: Call<Int>, t: Throwable) {
+                Toast.makeText(
+                    applicationContext, t.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun uploadRiesenieImg(popisID : Int?)
+    {
+        fun getRandomString(length: Int = 10) : String {
+            val charset = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789"
+            return (1..length)
+                .map { charset.random() }
+                .joinToString("")
+        }
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formatted = current.format(formatter).toString()
+        val randomString = getRandomString() + formatted
+
+        //upload img
+        val reqFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("image", file.name, reqFile)
+        val name = randomString.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val request = ServiceBuilder.buildService(CallsAPI::class.java)
+        val req = request.postRiesenieImg(body, name, sessionManager.fetchAuthToken().toString().toRequestBody("text/plain".toMediaTypeOrNull()), popisID.toString().toRequestBody("text/plain".toMediaTypeOrNull()))
+        /////////////////////////////////////
+        req.enqueue(object : Callback<Int> {
+            override fun onResponse(
+                call: Call<Int>,
+                response: Response<Int>
+            ) {
+                if (response.body() == 1)
+                    refresh()
+                if (response.body() == 0) {
+                    val builder = AlertDialog.Builder(this@DetailActivity, R.style.AlertDialogTheme)
+                    //set title for alert dialog
+                    builder.setTitle("HUUPS...")
+                    //set message for alert dialog
+                    builder.setMessage("Pridanie fotky neprebehlo v poriadku")
+                    builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+                    //performing cancel action
+                    builder.setNeutralButton("Ok") { dialogInterface, which ->
+                        dialogInterface.dismiss()
+                    }
+                    // Create the AlertDialog
+                    val alertDialog: AlertDialog = builder.create()
+                    // Set other dialog properties
+                    alertDialog.setCancelable(false)
+                    alertDialog.show()
+                }
+                Toast.makeText(
+                    this@DetailActivity,
+                    response.body().toString(),
+                    Toast.LENGTH_LONG
+                ).show()
+
+            }
+
+            override fun onFailure(call: Call<Int>, t: Throwable) {
+                val builder = AlertDialog.Builder(this@DetailActivity, R.style.AlertDialogTheme)
+                //set title for alert dialog
+                builder.setTitle("HUUPS...Príliž veĺké!")
+                //set message for alert dialog
+                builder.setMessage("Fotka nesmie mať viac ako 2MB")
+                builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+                //performing cancel action
+                builder.setNeutralButton("Ok"){dialogInterface , which ->
+                    dialogInterface.dismiss()
+                }
+                // Create the AlertDialog
+                val alertDialog: AlertDialog = builder.create()
+                // Set other dialog properties
+                alertDialog.setCancelable(false)
+                alertDialog.show()
+            }
+        })
     }
 
     fun getAll(){
@@ -260,7 +660,8 @@ class DetailActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
 
-                insertValues()
+                //insertValues()
+                getImgs()
 
             }
 
@@ -274,14 +675,45 @@ class DetailActivity : AppCompatActivity() {
 
     }
 
+    fun getImgs(){
 
+        val request = ServiceBuilder.buildService(CallsAPI::class.java)
+
+        val call = request.getImg(idProblem)
+        call.enqueue(object : Callback<List<Imgs>> {
+            override fun onResponse(
+                call: Call<List<Imgs>>,
+                response: Response<List<Imgs>>
+            ) {
+                val urls = response.body()
+                var i = 0
+                if (urls != null)
+                    for (item in urls) {
+                        imgProblemUrl = item.urlProblem
+                        imgRiesenieUrl = item.urlRiesenie
+                    }
+                insertValues()
+            }
+
+            override fun onFailure(call: Call<List<Imgs>>, t: Throwable) {
+                Toast.makeText(
+                    applicationContext, t.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+
+    }
+
+
+    @SuppressLint("CutPasteId")
     fun insertValues(){
 
-        Toast.makeText(
-            this@DetailActivity,
-            "test3",
-            Toast.LENGTH_LONG
-        ).show()
+
+        if (imgProblemUrl != "n" && imgProblemUrl != "")
+            Picasso.get().load("http://147.175.204.24/$imgProblemUrl").into(findViewById<ImageView>(R.id.imageView))
+        if (imgRiesenieUrl != "n" && imgRiesenieUrl != "")
+            Picasso.get().load("http://147.175.204.24/$imgRiesenieUrl").into(findViewById<ImageView>(R.id.fotoRiesenia))
 
         spinnerZamestnanec = findViewById(R.id.zamestnanecSpinner)
         spinnerPriorita = findViewById(R.id.prioritaSpinner)
@@ -289,6 +721,43 @@ class DetailActivity : AppCompatActivity() {
         spinnerStavProblemu = findViewById(R.id.stavProblemuSpinner)
         spinnerStavRieseniaProblemu = findViewById(R.id.stavRieseniaProblemuSpinner)
         spinnerVozidlo = findViewById(R.id.priradeneVozidloSpinner)
+
+        //access for roles
+        if (sessionManager.fetchUserRoleId() == "2" || sessionManager.fetchUserRoleId() == "1")
+        {
+            findViewById<Button>(R.id.fotoButton).isVisible = false
+            findViewById<Button>(R.id.deleteButton).isVisible = false
+            findViewById<Button>(R.id.potvrditButton).isVisible = false
+
+            spinnerZamestnanec.isClickable = false
+            spinnerZamestnanec.isEnabled = false
+            spinnerPriorita.isClickable = false
+            spinnerPriorita.isEnabled = false
+            spinnerKategoria.isClickable = false
+            spinnerKategoria.isEnabled = false
+            spinnerStavProblemu.isClickable = false
+            spinnerStavProblemu.isEnabled = false
+            spinnerStavRieseniaProblemu.isClickable = false
+            spinnerStavRieseniaProblemu.isEnabled = false
+            spinnerVozidlo.isClickable = false
+            spinnerVozidlo.isEnabled = false
+            findViewById<TextInputEditText>(R.id.poznmkaField).isClickable = false
+            findViewById<TextInputEditText>(R.id.poznmkaField).isEnabled = false
+        }
+
+        if (sessionManager.fetchUserRoleId() == "3" || sessionManager.fetchUserRoleId() == "4" ||
+                sessionManager.fetchUserRoleId() == "5")
+        {
+            findViewById<Button>(R.id.komentButton).isVisible = false
+
+            if (sessionManager.fetchUserRoleId() == "4")
+            {
+                spinnerZamestnanec.isClickable = false
+                spinnerZamestnanec.isEnabled = false
+            }
+        }
+
+
 
         val adapter = ArrayAdapter(
             this,
@@ -467,5 +936,23 @@ class DetailActivity : AppCompatActivity() {
         val popisRieseniaText: TextInputEditText = findViewById(R.id.poznmkaField)
         popisRieseniaText.setText(popisRiesenia)
 
+
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            imageUri = data?.data
+            imageView.setImageURI(imageUri)
+            val selectedImage: Uri? = data!!.data
+            val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
+            val cursor = contentResolver.query(selectedImage!!, filePathColumn, null, null, null) ?: return
+            cursor.moveToFirst()
+            val columnIndex = cursor.getColumnIndex(filePathColumn[0])
+            val filePath = cursor.getString(columnIndex)
+            cursor.close()
+            file = File(filePath)
+        }
+    }
+
 }

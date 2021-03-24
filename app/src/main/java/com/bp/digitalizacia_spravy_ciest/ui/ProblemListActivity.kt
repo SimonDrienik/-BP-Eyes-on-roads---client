@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -245,7 +246,12 @@ class ProblemListActivity : AppCompatActivity() {
         problemlist.setOnItemClickListener(){adapterView, view, position, id ->
             val itemAtPos = adapterView.getItemAtPosition(position)
             val itemIdAtPos = adapterView.getItemIdAtPosition(position)
-            Toast.makeText(this, "Click on item at $itemAtPos its item id $itemIdAtPos", Toast.LENGTH_LONG).show()
+            val problemID = view.findViewById<TextView>(R.id.problemID).text
+            Intent(this, DetailActivity::class.java).apply {
+                putExtra("problemID", problemID)
+                putExtra("from", allProblems)
+                startActivity(this)
+            }
         }
 
     }

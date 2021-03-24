@@ -1,8 +1,6 @@
 package com.bp.digitalizacia_spravy_ciest.server
 
-import com.bp.digitalizacia_spravy_ciest.models.LoginRequest
-import com.bp.digitalizacia_spravy_ciest.models.LoginResponse
-import com.bp.digitalizacia_spravy_ciest.models.Spinners
+import com.bp.digitalizacia_spravy_ciest.models.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -27,10 +25,24 @@ interface CallsAPI {
     @POST("/uploadProblemImage")
     fun postImage(@Part image: MultipartBody.Part, @Part("name") name: RequestBody): Call<BigInteger>
 
+    @Multipart
+    @POST("/api/uploadRiesenieImage")
+    fun postRiesenieImg(@Part image: MultipartBody.Part, @Part("name") name: RequestBody, @Part("token") token: RequestBody, @Part("riesenieID") id: RequestBody) : Call<Int>
+
     @POST("/api/loginAndroid")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
 
     @GET("/spinners")
     fun getSpinners() : Call<List<Spinners>>
+
+    @GET("/downloadImg/{id}")
+    fun getImg(@Path("id") id: Int?): Call<List<Imgs>>
+
+    @Headers("Content-Type: application/json")
+    @POST("/api/delete")
+    fun delete(@Body request: DeleteRequest): Call<Int>
+
+    @POST("/api/editProblem")
+    fun editProblem(@Body request: EditProblem): Call<Int>
 }
 

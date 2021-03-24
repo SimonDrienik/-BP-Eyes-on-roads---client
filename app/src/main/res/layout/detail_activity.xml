@@ -382,14 +382,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="70dp"
             android:fontFamily="monospace"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
             android:text="Zrusit"
             app:backgroundTint="@android:color/holo_red_dark"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/toolbar3" />
+            app:layout_constraintTop_toTopOf="@id/historiaButton" />
 
         <Button
             android:id="@+id/komentButton"
@@ -409,7 +409,7 @@
             android:id="@+id/potvrditButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="22dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:fontFamily="monospace"
@@ -418,7 +418,7 @@
             android:text="Potvrdit"
             app:backgroundTint="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/komentButton" />
+            app:layout_constraintTop_toBottomOf="@id/historiaButton" />
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar3"
@@ -430,7 +430,7 @@
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/komentButton" />
+            app:layout_constraintTop_toBottomOf="@id/historiaButton" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
