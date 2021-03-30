@@ -38,6 +38,9 @@ interface CallsAPI {
     @GET("/downloadImg/{id}")
     fun getImg(@Path("id") id: Int?): Call<List<Imgs>>
 
+    @GET("/history/{attribute}/{problemID}")
+    fun getHistory(@Path("attribute") id: Int?, @Path("problemID") problemID: Int?): Call<List<ShowHistory>>
+
     @Headers("Content-Type: application/json")
     @POST("/api/delete")
     fun delete(@Body request: DeleteRequest): Call<Int>

@@ -71,6 +71,11 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".ui.HistoryActivity"
+            android:label="@string/OciNaCeste"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".ui.DetailActivity"
             android:label="@string/OciNaCeste"
             android:screenOrientation="portrait"

@@ -8,6 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.ContextMenu
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -434,7 +437,86 @@ class DetailActivity : AppCompatActivity() {
             send()
 
         }
+        registerForContextMenu(findViewById<Button>(R.id.historiaButton))
+        findViewById<Button>(R.id.historiaButton).setOnClickListener {
+            openContextMenu(findViewById<Button>(R.id.historiaButton))
+            true
+        }
 
+    }
+    // riesenieImg = 0, komentar = 1, popisStavuRieseniaProblemu = 2,
+    //priradeneVozidlo = 3, priradenyZamestnanec = 4, stavRieseniaProblemu = 5,
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        menu?.setHeaderTitle("Vyberte zobrazenie historie")
+        menu?.add(0, v?.id!!, 0, "Fotky riesenia problemu")
+        menu?.add(0, v?.id!!, 1, "Komentare")
+        menu?.add(1, v?.id!!, 0, "popisy stavu riesenia")
+        menu?.add(1, v?.id!!, 0, "priradene vozidla")
+        menu?.add(1, v?.id!!, 0, "priradeni zamestnanci")
+        menu?.add(1, v?.id!!, 0, "stavy riesenia problemu")
+
+    }
+
+    @SuppressLint("ResourceType")
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.layout.popup_menu, menu)
+        return true
+    }
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+
+        when {
+            item.title == "Fotky riesenia problemu" -> {
+                val intent2 = Intent(this, HistoryActivity::class.java)
+                intent2.putExtra("from", from)
+                intent2.putExtra("problemID", idProblem)
+                intent2.putExtra("attribute", 0)
+                startActivity(intent2)
+                return true
+            }
+            item.title == "Komentare" -> {
+                val intent2 = Intent(this, HistoryActivity::class.java)
+                intent2.putExtra("from", from)
+                intent2.putExtra("problemID", idProblem)
+                intent2.putExtra("attribute", 1)
+                startActivity(intent2)
+                return true
+            }
+            item.title == "popisy stavu riesenia" -> {
+                val intent2 = Intent(this, HistoryActivity::class.java)
+                intent2.putExtra("from", from)
+                intent2.putExtra("problemID", idProblem)
+                intent2.putExtra("attribute", 2)
+                startActivity(intent2)
+                return true
+            }
+            item.title == "priradene vozidla" -> {
+                val intent2 = Intent(this, HistoryActivity::class.java)
+                intent2.putExtra("from", from)
+                intent2.putExtra("problemID", idProblem)
+                intent2.putExtra("attribute", 3)
+                startActivity(intent2)
+                return true
+            }
+            item.title == "priradeni zamestnanci" -> {
+                val intent2 = Intent(this, HistoryActivity::class.java)
+                intent2.putExtra("from", from)
+                intent2.putExtra("problemID", idProblem)
+                intent2.putExtra("attribute", 4)
+                startActivity(intent2)
+                return true
+            }
+            item.title == "stavy riesenia problemu" -> {
+                val intent2 = Intent(this, HistoryActivity::class.java)
+                intent2.putExtra("from", from)
+                intent2.putExtra("problemID", idProblem)
+                intent2.putExtra("attribute", 5)
+                startActivity(intent2)
+                return true
+            }
+            else -> return super.onContextItemSelected(item)
+        }
     }
 
     fun refresh()
@@ -560,11 +642,6 @@ class DetailActivity : AppCompatActivity() {
                     alertDialog.setCancelable(false)
                     alertDialog.show()
                 }
-                Toast.makeText(
-                    this@DetailActivity,
-                    response.body().toString(),
-                    Toast.LENGTH_LONG
-                ).show()
 
             }
 
@@ -615,11 +692,7 @@ class DetailActivity : AppCompatActivity() {
                     popisRiesenia = item.popis_riesenia_problemu
 
                 }
-                Toast.makeText(
-                    this@DetailActivity,
-                    zamestnanec,
-                    Toast.LENGTH_LONG
-                ).show()
+
                 getSpinners()
 
             }
@@ -654,11 +727,7 @@ class DetailActivity : AppCompatActivity() {
                     vozidla = item.vozidla
                 }
 
-                Toast.makeText(
-                    this@DetailActivity,
-                    "test2",
-                    Toast.LENGTH_LONG
-                ).show()
+
 
                 //insertValues()
                 getImgs()
@@ -691,6 +760,7 @@ class DetailActivity : AppCompatActivity() {
                     for (item in urls) {
                         imgProblemUrl = item.urlProblem
                         imgRiesenieUrl = item.urlRiesenie
+
                     }
                 insertValues()
             }
@@ -708,7 +778,6 @@ class DetailActivity : AppCompatActivity() {
 
     @SuppressLint("CutPasteId")
     fun insertValues(){
-
 
         if (imgProblemUrl != "n" && imgProblemUrl != "")
             Picasso.get().load("http://147.175.204.24/$imgProblemUrl").into(findViewById<ImageView>(R.id.imageView))

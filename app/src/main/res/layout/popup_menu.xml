@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <item
+        android:id="@+id/fotoRiesenia"
+        android:title="Fotky riesenia problemu"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/koment"
+        android:title="Komentare"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/popisStavu"
+        android:title="popisy stavu riesenia"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/vozdilo"
+        android:title="priradene vozidla"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/zamestnanec"
+        android:title="Zamestnanci"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/stavRiesenia"
+        android:title="stavy riesenia problemu"
+        app:showAsAction="never"/>
+</menu>

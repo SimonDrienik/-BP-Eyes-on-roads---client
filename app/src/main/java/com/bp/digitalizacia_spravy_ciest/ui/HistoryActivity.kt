@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -13,23 +13,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bp.digitalizacia_spravy_ciest.R
-import com.bp.digitalizacia_spravy_ciest.adapters.MyListAdapter
-import com.bp.digitalizacia_spravy_ciest.models.ShowAllProblemsData
+import com.bp.digitalizacia_spravy_ciest.adapters.HistoryAdapter
+import com.bp.digitalizacia_spravy_ciest.adapters.HistoryAdapterImg
+import com.bp.digitalizacia_spravy_ciest.models.ShowHistory
 import com.bp.digitalizacia_spravy_ciest.server.CallsAPI
 import com.bp.digitalizacia_spravy_ciest.server.ServiceBuilder
 import com.bp.digitalizacia_spravy_ciest.utils.SessionManager
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.history_activity.*
 import kotlinx.android.synthetic.main.layout_navigation_header.view.*
 import kotlinx.android.synthetic.main.problems_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.math.BigInteger
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
 
-class ProblemListActivity : AppCompatActivity() {
+class HistoryActivity : AppCompatActivity() {
 
     //  menu staff - Initialise the DrawerLayout, NavigationView and ToggleBar
     private lateinit var drawerLayout: DrawerLayout
@@ -37,17 +37,11 @@ class ProblemListActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private lateinit var sessionManager: SessionManager
 
-    var extras : Bundle? = null
+    private var extras: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.problems_list)
-
-        var pocet: Int
-
-        //allProblems 1 or myProblems 0
-        extras = intent.extras
-        val allProblems = extras!!.getInt("allProblems")
+        setContentView(R.layout.history_activity)
 
         /////////////////////////////MENU STUFF/////////////////////////////////
         //hamburger for side menu drawer
@@ -166,76 +160,76 @@ class ProblemListActivity : AppCompatActivity() {
 
         ///////////////END OF MENU STUFF////////////////////////////////////////////
 
+        extras = intent.extras
+        val from = extras!!.getInt("from")
+        val attribute = extras!!.getInt("attribute")
+        val problemID = extras!!.getInt("problemID")
+
+        findViewById<Button>(R.id.zrusit).setOnClickListener {
+            val intent2 = Intent(this, DetailActivity::class.java)
+            intent2.putExtra("from", from)
+            intent2.putExtra("problemID", problemID)
+            startActivity(intent2)
+        }
 
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems(0)
-        call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
+        // riesenieImg = 0, komentar = 1, popisStavuRieseniaProblemu = 2,
+        //priradeneVozidlo = 3, priradenyZamestnanec = 4, stavRieseniaProblemu = 5,
+        val call = request.getHistory(attribute, problemID)
+        call.enqueue(object : Callback<List<ShowHistory>> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
-                call: Call<List<ShowAllProblemsData?>?>,
-                response: Response<List<ShowAllProblemsData?>?>
+                call: Call<List<ShowHistory>>,
+                response: Response<List<ShowHistory>>
             ) {
                 if (response.body() != null) {
                     Toast.makeText(
-                        this@ProblemListActivity,
+                        this@HistoryActivity,
                         "Zaznamy uspesne zobrazene",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
 
                 val problemList = response.body()
-                pocet = 0
-
-                if (allProblems == 1)
-                    pocet = problemList?.size!!
-
-                if (allProblems == 0)
-                    for (item in problemList!!)
-                    {
-                        if (item!!.pouzivatel == sessionManager.fetchUserId()!!.toBigInteger())
-                            pocet += 1
-
-                    }
-
-                var categories = arrayOfNulls<String>(pocet)
-                var dates = arrayOfNulls<LocalDate>(pocet)
-                var IDs = arrayOfNulls<BigInteger>(pocet)
-
-                if (problemList != null) {
-                    var i = 0
-                    if (allProblems == 0) {
-                        for (item in problemList) {
-                            if (item!!.pouzivatel == sessionManager.fetchUserId()!!
-                                    .toBigInteger() && allProblems == 0
-                            ) {
-                                IDs[pocet - i - 1] = item!!.id
-                                categories[pocet - i - 1] = item.kategoria
-                                dates[pocet - i - 1] = LocalDate.parse(
-                                    item.created_at,
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                                )
-                                i += 1
-                            }
-                        }
-                    }
-                    if (allProblems == 1) {
-                        for (item in problemList) {
-
-                            IDs[pocet - i - 1] = item!!.id
-                            categories[pocet - i - 1] = item.kategoria
-                            dates[pocet - i - 1] = LocalDate.parse(item.created_at,
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                            i += 1
-                        }
-                    }
-
+                val pocet : Int
+                if (problemList!!.size < 1) {
+                    pocet = 1
                 }
-                val myListAdapter = MyListAdapter(this@ProblemListActivity, IDs, categories, dates, pocet)
-                problemlist.adapter = myListAdapter
+                else {
+                    pocet = problemList.size
+                }
+
+                val names = arrayOfNulls<String>(pocet-1)
+                val dates = arrayOfNulls<LocalDate>(pocet-1)
+                val users = arrayOfNulls<String>(pocet-1)
+
+                if (problemList.size > 1) {
+                    var i = 0
+                    for (item in problemList) {
+                        if (i < pocet - 1) {
+                            names[pocet - i - 2] = item.name
+                            dates[pocet - i - 2] = LocalDate.parse(
+                                item.created_at,
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                            )
+                            users[pocet - i - 2] = item.user
+                        }
+                        i += 1
+                    }
+                }
+                if (attribute != 0) {
+                    val historyAdapter = HistoryAdapter(this@HistoryActivity, names, dates, pocet-1)
+                    historylist.adapter = historyAdapter
+                }
+                else {
+                    val historyAdapter = HistoryAdapterImg(this@HistoryActivity, names, dates, pocet-1, users)
+                    historylist.adapter = historyAdapter
+                }
+
             }
 
-            override fun onFailure(call: Call<List<ShowAllProblemsData?>?>, t: Throwable) {
+            override fun onFailure(call: Call<List<ShowHistory>>, t: Throwable) {
                 Toast.makeText(
                     applicationContext, t.message,
                     Toast.LENGTH_SHORT
@@ -244,18 +238,5 @@ class ProblemListActivity : AppCompatActivity() {
 
         })
 
-        problemlist.setOnItemClickListener(){adapterView, view, position, id ->
-            val itemAtPos = adapterView.getItemAtPosition(position)
-            val itemIdAtPos = adapterView.getItemIdAtPosition(position)
-            val problemID = view.findViewById<TextView>(R.id.problemID).text
-            Intent(this, DetailActivity::class.java).apply {
-                putExtra("problemID", problemID)
-                putExtra("from", allProblems)
-                startActivity(this)
-            }
-        }
-
     }
-
-
 }
