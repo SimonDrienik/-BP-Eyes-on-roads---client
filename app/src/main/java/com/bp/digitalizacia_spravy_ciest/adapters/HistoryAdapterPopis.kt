@@ -11,8 +11,8 @@ import androidx.annotation.RequiresApi
 import com.bp.digitalizacia_spravy_ciest.R
 import java.time.LocalDate
 
-class HistoryAdapter(private val context: Activity, private val name: Array<String?>, private val dates: Array<LocalDate?>, private val pocet: Int)
-    : ArrayAdapter<String>(context, R.layout.history_adapter, name) {
+class HistoryAdapterPopis(private val context: Activity, private val name: Array<String?>, private val dates: Array<LocalDate?>, private val pocet: Int)
+    : ArrayAdapter<String>(context, R.layout.history_adapter_popis, name) {
 
 
     var stringDates = arrayOfNulls<String>(pocet)
@@ -27,7 +27,7 @@ class HistoryAdapter(private val context: Activity, private val name: Array<Stri
         }
 
         val inflater = context.layoutInflater
-        val rowView = inflater.inflate(R.layout.history_adapter, null, true)
+        val rowView = inflater.inflate(R.layout.history_adapter_popis, null, true)
 
         val nameText = rowView.findViewById(R.id.name) as TextView
         val date = rowView.findViewById(R.id.date) as TextView

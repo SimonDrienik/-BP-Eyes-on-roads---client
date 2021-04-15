@@ -11,8 +11,8 @@ import androidx.annotation.RequiresApi
 import com.bp.digitalizacia_spravy_ciest.R
 import java.time.LocalDate
 
-class HistoryAdapter(private val context: Activity, private val name: Array<String?>, private val dates: Array<LocalDate?>, private val pocet: Int)
-    : ArrayAdapter<String>(context, R.layout.history_adapter, name) {
+class HistoryAdapterKomentar(private val context: Activity, private val name: Array<String?>, private val dates: Array<LocalDate?>, private val pocet: Int, private val users: Array<String?>)
+    : ArrayAdapter<String>(context, R.layout.history_adapter_komentar, name) {
 
 
     var stringDates = arrayOfNulls<String>(pocet)
@@ -27,13 +27,15 @@ class HistoryAdapter(private val context: Activity, private val name: Array<Stri
         }
 
         val inflater = context.layoutInflater
-        val rowView = inflater.inflate(R.layout.history_adapter, null, true)
+        val rowView = inflater.inflate(R.layout.history_adapter_komentar, null, true)
 
         val nameText = rowView.findViewById(R.id.name) as TextView
         val date = rowView.findViewById(R.id.date) as TextView
+        val user = rowView.findViewById(R.id.user) as TextView
 
         nameText.text = name[position]
         date.text = stringDates[position]
+        user.text = users[position]
 
         return rowView
     }

@@ -6,14 +6,16 @@ import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.bp.digitalizacia_spravy_ciest.R
+import com.squareup.picasso.Picasso
 import java.time.LocalDate
 
 class HistoryAdapterImg (private val context: Activity, private val name: Array<String?>,
-                         private val dates: Array<LocalDate?>, private val pocet: Int, private val users: Array<String?>)
-    : ArrayAdapter<String>(context, R.layout.history_adapter, name) {
+                         private val dates: Array<LocalDate?>, private val pocet: Int)
+    : ArrayAdapter<String>(context, R.layout.history_adapter_img, name) {
 
 
     var stringDates = arrayOfNulls<String>(pocet)
@@ -26,14 +28,13 @@ class HistoryAdapterImg (private val context: Activity, private val name: Array<
             stringDates[i] = item.toString()
             i += 1
         }
-
         val inflater = context.layoutInflater
-        val rowView = inflater.inflate(R.layout.history_adapter, null, true)
+        val rowView = inflater.inflate(R.layout.history_adapter_img, null, true)
 
-        val nameText = rowView.findViewById(R.id.name) as TextView
+        val foto = rowView.findViewById(R.id.fotoRieseniaHistory) as ImageView
         val date = rowView.findViewById(R.id.date) as TextView
 
-        nameText.text = name[position]
+        Picasso.get().load("http://147.175.204.24/"+name[position]).into(foto)
         date.text = stringDates[position]
 
         return rowView

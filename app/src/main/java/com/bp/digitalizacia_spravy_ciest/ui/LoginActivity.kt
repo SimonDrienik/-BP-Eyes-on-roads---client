@@ -86,7 +86,8 @@ class LoginActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menuZoznamPouzivatelov -> {
-                    Toast.makeText(this, "zoznam pouzivatelov", Toast.LENGTH_SHORT).show()
+                    val intent2 = Intent(this, UsersListActivity::class.java)
+                    startActivity(intent2)
                     true
                 }
                 R.id.mapFragment4 -> {

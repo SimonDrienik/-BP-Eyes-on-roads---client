@@ -150,7 +150,8 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     true
                 }
                 R.id.menuZoznamPouzivatelov -> {
-                    Toast.makeText(this, "zoznam pouzivatelov", Toast.LENGTH_SHORT).show()
+                    val intent2 = Intent(this, UsersListActivity::class.java)
+                    startActivity(intent2)
                     true
                 }
                 R.id.mapFragment4 -> {
@@ -272,7 +273,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         map = googleMap
         val Trnava = LatLng(48.717850, 19.457415)
         map.addMarker(MarkerOptions().position(Trnava).title("Vitajte"))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(Trnava, 12.0f)) //nastavenie inintial zoom
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(Trnava, 3.0f)) //nastavenie inintial zoom
         map.getUiSettings().setZoomControlsEnabled(false)
         map.setOnMarkerClickListener(this)
         setUpMap()
@@ -459,7 +460,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     fun getAll(map: GoogleMap) {
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems(0)
+        val call = request.getProblems(0, sessionManager.fetchUserRoleId()?.toInt())
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             override fun onResponse(
                 call: Call<List<ShowAllProblemsData?>?>,
@@ -488,16 +489,18 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
                         // Toast.makeText(this@MapsActivity, "ok $i", Toast.LENGTH_SHORT).show()
 
+
+
                         Log.d("TAG", pos1.toString())
                         Log.d("TAG", pos2.toString())
                         Log.d("TAG", id_problemu.toString())
                         Log.d("TAG", popis.toString())
                         val snippet = String.format(
                             Locale.getDefault(),
-                                    " kategoria: $kategoria\n " +
-                                    "Stav Riesenia Problemu: $stavRieseniaProblemu\n " +
-                                    "Stav Problemu: $stav_problemu\n " +
-                                    "datum: $created_at"
+                                    " kategória: $kategoria\n " +
+                                    "Stav Riešenia Problému: $stavRieseniaProblemu\n " +
+                                    "Stav Problému: $stav_problemu\n " +
+                                    "Pridané: $created_at"
 
                         )
 

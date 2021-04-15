@@ -76,6 +76,17 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".ui.CommentActivity"
+            android:label="@string/OciNaCeste"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.UsersListActivity"
+            android:label="@string/OciNaCeste"
+            android:screenOrientation="portrait" />
+
+
+        <activity
             android:name=".ui.DetailActivity"
             android:label="@string/OciNaCeste"
             android:screenOrientation="portrait"

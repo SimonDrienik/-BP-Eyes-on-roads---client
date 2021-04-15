@@ -46,6 +46,14 @@
         <item>Zle viditelna</item>
         <item>Prerastena</item>
     </string-array>
+
+    <string-array name="role">
+        <item>Verejnosť</item>
+        <item>Dispečer</item>
+        <item>Manažér</item>
+        <item>Administrátor</item>
+    </string-array>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_nav_drawer">NavDrawer</string>
@@ -56,7 +64,9 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="Yes" style="color:black">Áno</string>
-
+    <string name="Vymazat"><font fgcolor="#ff9a1d1d">Vymazať!</font></string>
+    <string name="Zrusit"><font fgcolor="#00000">Zrušiť</font></string>
+    <string name="ZmenaRole"><font fgcolor="#ff9a1d1d">Potvrdiť</font></string>
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>

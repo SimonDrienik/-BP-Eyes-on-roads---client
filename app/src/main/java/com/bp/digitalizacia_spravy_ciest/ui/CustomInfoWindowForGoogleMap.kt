@@ -20,6 +20,7 @@ class CustomInfoWindowForGoogleMap(context: Context) : GoogleMap.InfoWindowAdapt
 
         tvTitle.text = marker.title
         tvSnippet.text = marker.snippet
+        tvTitle.visibility = View.GONE
 
     }
 

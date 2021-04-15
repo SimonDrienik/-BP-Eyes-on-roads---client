@@ -93,7 +93,8 @@ class ProblemListActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menuZoznamPouzivatelov -> {
-                    Toast.makeText(this, "zoznam pouzivatelov", Toast.LENGTH_SHORT).show()
+                    val intent2 = Intent(this, UsersListActivity::class.java)
+                    startActivity(intent2)
                     true
                 }
                 R.id.mapFragment4 -> {
@@ -169,7 +170,7 @@ class ProblemListActivity : AppCompatActivity() {
 
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems(0)
+        val call = request.getProblems(0, sessionManager.fetchUserRoleId()?.toInt())
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(

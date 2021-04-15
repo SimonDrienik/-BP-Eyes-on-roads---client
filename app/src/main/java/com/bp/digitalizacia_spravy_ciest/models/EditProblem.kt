@@ -28,5 +28,8 @@ data class EditProblem(
     var token: String,
 
     @SerializedName("problemID")
-    var problemID: Int
+    var problemID: Int,
+
+    @SerializedName("verejne")
+    var verejne: Int
 )

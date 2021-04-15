@@ -15,6 +15,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.bp.digitalizacia_spravy_ciest.R
 import com.bp.digitalizacia_spravy_ciest.adapters.HistoryAdapter
 import com.bp.digitalizacia_spravy_ciest.adapters.HistoryAdapterImg
+import com.bp.digitalizacia_spravy_ciest.adapters.HistoryAdapterKomentar
+import com.bp.digitalizacia_spravy_ciest.adapters.HistoryAdapterPopis
 import com.bp.digitalizacia_spravy_ciest.models.ShowHistory
 import com.bp.digitalizacia_spravy_ciest.server.CallsAPI
 import com.bp.digitalizacia_spravy_ciest.server.ServiceBuilder
@@ -87,7 +89,8 @@ class HistoryActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menuZoznamPouzivatelov -> {
-                    Toast.makeText(this, "zoznam pouzivatelov", Toast.LENGTH_SHORT).show()
+                    val intent2 = Intent(this, UsersListActivity::class.java)
+                    startActivity(intent2)
                     true
                 }
                 R.id.mapFragment4 -> {
@@ -176,7 +179,9 @@ class HistoryActivity : AppCompatActivity() {
 
         // riesenieImg = 0, komentar = 1, popisStavuRieseniaProblemu = 2,
         //priradeneVozidlo = 3, priradenyZamestnanec = 4, stavRieseniaProblemu = 5,
-        val call = request.getHistory(attribute, problemID)
+        val call = request.getHistory(attribute, problemID,
+            sessionManager.fetchUserRoleId()?.toInt()
+        )
         call.enqueue(object : Callback<List<ShowHistory>> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
@@ -193,37 +198,48 @@ class HistoryActivity : AppCompatActivity() {
 
                 val problemList = response.body()
                 val pocet : Int
-                if (problemList!!.size < 1) {
+                if (problemList!!.size < 1 && attribute != 1) {
                     pocet = 1
                 }
                 else {
                     pocet = problemList.size
                 }
+                var k = 0;
+                if (attribute != 1)
+                    k = 1
 
-                val names = arrayOfNulls<String>(pocet-1)
-                val dates = arrayOfNulls<LocalDate>(pocet-1)
-                val users = arrayOfNulls<String>(pocet-1)
+                val names = arrayOfNulls<String>(pocet-k)
+                val dates = arrayOfNulls<LocalDate>(pocet-k)
+                val users = arrayOfNulls<String>(pocet-k)
 
-                if (problemList.size > 1) {
+                if (problemList.size > 1 || (problemList.size > 0 && attribute == 1)) {
                     var i = 0
                     for (item in problemList) {
-                        if (i < pocet - 1) {
-                            names[pocet - i - 2] = item.name
-                            dates[pocet - i - 2] = LocalDate.parse(
+                        if (i < pocet - k) {
+                            names[pocet - i - 1 - k] = item.name
+                            dates[pocet - i - 1 - k] = LocalDate.parse(
                                 item.created_at,
                                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                             )
-                            users[pocet - i - 2] = item.user
+                            users[pocet - i - 1 - k] = item.user
                         }
                         i += 1
                     }
-                }
-                if (attribute != 0) {
+                }//klasicky adapter
+                if (attribute != 0 && attribute != 1 && attribute != 2) {
                     val historyAdapter = HistoryAdapter(this@HistoryActivity, names, dates, pocet-1)
                     historylist.adapter = historyAdapter
+                }//adapter pre obrazky
+                else if (attribute == 0){
+                    val historyAdapter = HistoryAdapterImg(this@HistoryActivity, names, dates, pocet-1)
+                    historylist.adapter = historyAdapter
                 }
-                else {
-                    val historyAdapter = HistoryAdapterImg(this@HistoryActivity, names, dates, pocet-1, users)
+                else if (attribute == 1){
+                    val historyAdapter = HistoryAdapterKomentar(this@HistoryActivity, names, dates, pocet-k, users)
+                    historylist.adapter = historyAdapter
+                }
+                else if (attribute == 2){
+                    val historyAdapter = HistoryAdapterPopis(this@HistoryActivity, names, dates, pocet-1)
                     historylist.adapter = historyAdapter
                 }
 

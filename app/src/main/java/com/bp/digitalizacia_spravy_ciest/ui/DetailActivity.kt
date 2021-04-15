@@ -30,8 +30,10 @@ import com.bp.digitalizacia_spravy_ciest.utils.SessionManager
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.add_comment_activity.*
 import kotlinx.android.synthetic.main.custom_list.*
 import kotlinx.android.synthetic.main.layout_navigation_header.view.*
+import kotlinx.android.synthetic.main.login_activity.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -157,12 +159,16 @@ class DetailActivity : AppCompatActivity() {
     private var priradeneVozidloChange = ""
     private var opisRieseniaChange: String = ""
 
+    lateinit var verejne: CheckBox
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.detail_activity)
+
+
 
 
         /////////////////////////////MENU STUFF/////////////////////////////////
@@ -209,7 +215,8 @@ class DetailActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menuZoznamPouzivatelov -> {
-                    Toast.makeText(this, "zoznam pouzivatelov", Toast.LENGTH_SHORT).show()
+                    val intent2 = Intent(this, UsersListActivity::class.java)
+                    startActivity(intent2)
                     true
                 }
                 R.id.mapFragment4 -> {
@@ -282,12 +289,37 @@ class DetailActivity : AppCompatActivity() {
 
         ///////////////END OF MENU STUFF////////////////////////////////////////////
 
+        if (sessionManager.fetchUserRoleId()?.toInt()!! == 5)
+            findViewById<Button>(R.id.deleteButton).visibility = View.GONE
+
+        if (sessionManager.fetchUserRoleId()?.toInt()!! < 3)
+        {
+            findViewById<TextView>(R.id.zamestnanecLabel).visibility = View.GONE
+            findViewById<Spinner>(R.id.zamestnanecSpinner).visibility = View.GONE
+
+            findViewById<TextView>(R.id.prioritaLabel).visibility = View.GONE
+            findViewById<Spinner>(R.id.prioritaSpinner).visibility = View.GONE
+
+            findViewById<TextView>(R.id.priradeneVozidloLabel).visibility = View.GONE
+            findViewById<Spinner>(R.id.priradeneVozidloSpinner).visibility = View.GONE
+        }
+
+
+
+
+        verejne = findViewById(R.id.checkBox1)
+
+        if (sessionManager.fetchUserRoleId()?.toInt()!! < 3)
+            verejne.visibility = View.GONE
+
         extras = intent.extras
         if (null != extras) {
             idProblem = extras!!.getInt("problemID")
             from = extras!!.getInt("from")
         }
         getAll()
+
+
         if (from == 1)
             findViewById<Button>(R.id.zrusitButton).setOnClickListener {
                 Intent(this, ProblemListActivity::class.java).apply {
@@ -423,7 +455,8 @@ class DetailActivity : AppCompatActivity() {
                 priradeneVozidloChange = "n"
 
             //kontrola zmenenych udajov opis Riesenia
-            if (popisRiesenia != findViewById<TextInputEditText>(R.id.poznmkaField).text.toString())
+            if (popisRiesenia != findViewById<TextInputEditText>(R.id.poznmkaField).text.toString() &&
+                findViewById<TextInputEditText>(R.id.poznmkaField).text.toString() != "")
                 opisRieseniaChange = findViewById<TextInputEditText>(R.id.poznmkaField).text.toString()
             else
                 opisRieseniaChange = "n"
@@ -441,6 +474,13 @@ class DetailActivity : AppCompatActivity() {
         findViewById<Button>(R.id.historiaButton).setOnClickListener {
             openContextMenu(findViewById<Button>(R.id.historiaButton))
             true
+        }
+
+        findViewById<Button>(R.id.komentButton).setOnClickListener {
+            val intent2 = Intent(this, CommentActivity::class.java)
+            intent2.putExtra("from", from)
+            intent2.putExtra("problemID", idProblem)
+            startActivity(intent2)
         }
 
     }
@@ -476,6 +516,7 @@ class DetailActivity : AppCompatActivity() {
                 return true
             }
             item.title == "Komentare" -> {
+                finish()
                 val intent2 = Intent(this, HistoryActivity::class.java)
                 intent2.putExtra("from", from)
                 intent2.putExtra("problemID", idProblem)
@@ -530,9 +571,13 @@ class DetailActivity : AppCompatActivity() {
 
     fun send()
     {
+        var verejneValue = 0
+        if (verejne.isChecked)
+            verejneValue = 1
+
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
         val call = request.editProblem(EditProblem(zamestnanecChange, prioritaChange,
-            kategoriaChange, stavChange, stavRieseniaChange, priradeneVozidloChange, opisRieseniaChange, sessionManager.fetchAuthToken().toString(), problemID = idProblem))
+            kategoriaChange, stavChange, stavRieseniaChange, priradeneVozidloChange, opisRieseniaChange, sessionManager.fetchAuthToken().toString(), problemID = idProblem, verejneValue))
         call.enqueue(object : Callback<Int> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
@@ -669,7 +714,7 @@ class DetailActivity : AppCompatActivity() {
     fun getAll(){
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems(idProblem)
+        val call = request.getProblems(idProblem, sessionManager.fetchUserRoleId()?.toInt())
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             override fun onResponse(
                 call: Call<List<ShowAllProblemsData?>?>,
@@ -693,6 +738,13 @@ class DetailActivity : AppCompatActivity() {
 
                 }
 
+
+                if (popisRiesenia == "neuvedene") {
+                    findViewById<TextInputEditText>(R.id.poznmkaField).setText(" ")
+                }
+
+
+
                 getSpinners()
 
             }
@@ -703,6 +755,8 @@ class DetailActivity : AppCompatActivity() {
                 ).show()
             }
         })
+
+
     }
 
     fun getSpinners(){
@@ -1004,6 +1058,10 @@ class DetailActivity : AppCompatActivity() {
 
         val popisRieseniaText: TextInputEditText = findViewById(R.id.poznmkaField)
         popisRieseniaText.setText(popisRiesenia)
+
+        if (popisRiesenia == "neuvedene") {
+            findViewById<TextInputEditText>(R.id.poznmkaField).setText(" ")
+        }
 
 
     }

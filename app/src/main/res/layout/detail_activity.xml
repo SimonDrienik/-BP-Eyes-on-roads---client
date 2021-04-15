@@ -325,6 +325,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/poznamkaLabel" />
+        <CheckBox
+            android:id="@+id/checkBox1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/poznmkaField"
+            android:text="Verejné" />
 
         <ImageView
             android:id="@+id/fotoRiesenia"
@@ -344,11 +353,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="monospace"
-            android:text="Pridat foto popisu riesenia"
+            android:text="Pridať aktuálnu foto"
             app:backgroundTint="@color/colorPrimaryDark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/poznmkaField" />
+            app:layout_constraintTop_toBottomOf="@+id/checkBox1" />
 
         <Button
             android:id="@+id/deleteButton"

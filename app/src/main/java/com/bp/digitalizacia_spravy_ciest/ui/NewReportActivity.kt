@@ -216,7 +216,15 @@ class NewReportActivity : AppCompatActivity()  {
 
                             newID = response.body()!!
                             send()
+                            Toast.makeText(
+                                this@NewReportActivity, "pohoda",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+                        Toast.makeText(
+                            this@NewReportActivity, response.body().toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                     }
 
