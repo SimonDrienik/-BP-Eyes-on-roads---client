@@ -85,6 +85,11 @@
             android:label="@string/OciNaCeste"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".ui.FilterActivity"
+            android:label="@string/OciNaCeste"
+            android:screenOrientation="portrait" />
+
 
         <activity
             android:name=".ui.DetailActivity"

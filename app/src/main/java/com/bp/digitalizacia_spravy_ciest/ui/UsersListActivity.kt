@@ -3,6 +3,7 @@ package com.bp.digitalizacia_spravy_ciest.ui
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
@@ -114,7 +115,8 @@ class UsersListActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menuRegistracia -> {
-                    Toast.makeText(this, "registracia", Toast.LENGTH_SHORT).show()
+                    val i = Intent(Intent.ACTION_VIEW, Uri.parse("http://147.175.204.24/register"))
+                    startActivity(i)
                     true
                 }
                 R.id.menuOdhlasenie -> {
@@ -170,6 +172,8 @@ class UsersListActivity : AppCompatActivity() {
         }
 
         ///////////////END OF MENU STUFF////////////////////////////////////////////
+
+
 
         val context = this
 

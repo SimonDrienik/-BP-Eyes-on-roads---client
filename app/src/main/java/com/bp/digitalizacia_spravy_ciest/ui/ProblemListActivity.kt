@@ -1,9 +1,11 @@
 package com.bp.digitalizacia_spravy_ciest.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -39,6 +41,15 @@ class ProblemListActivity : AppCompatActivity() {
 
     var extras : Bundle? = null
 
+    private var zamestnanecFilter: String = "-"
+    private var stavProblemuFilter: String = "-"
+    private var kategoriaFilter: String = "-"
+    private var DatumOdFilter: String = "0000-00-00"
+    private var DatumDoFilter: String = "0000-00-00"
+    private var vozidloFilter: String = "-"
+    private var prioritaFilter: String = "-"
+    private var stavRieseniaFilter: String = "-"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.problems_list)
@@ -48,6 +59,19 @@ class ProblemListActivity : AppCompatActivity() {
         //allProblems 1 or myProblems 0
         extras = intent.extras
         val allProblems = extras!!.getInt("allProblems")
+
+        if (extras!!.getString("zamestnanecFilter") != null)
+        {
+            zamestnanecFilter = extras!!.getString("zamestnanecFilter").toString()
+            stavProblemuFilter = extras!!.getString("stavProblemuFilter").toString()
+            kategoriaFilter = extras!!.getString("kategoriaFilter").toString()
+            DatumOdFilter = extras!!.getString("DatumOdFilter").toString()
+            DatumDoFilter = extras!!.getString("DatumDoFilter").toString()
+            vozidloFilter = extras!!.getString("vozidloFilter").toString()
+            prioritaFilter = extras!!.getString("prioritaFilter").toString()
+            stavRieseniaFilter = extras!!.getString("stavRieseniaFilter").toString()
+
+        }
 
         /////////////////////////////MENU STUFF/////////////////////////////////
         //hamburger for side menu drawer
@@ -110,7 +134,8 @@ class ProblemListActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menuRegistracia -> {
-                    Toast.makeText(this, "registracia", Toast.LENGTH_SHORT).show()
+                    val i = Intent(Intent.ACTION_VIEW, Uri.parse("http://147.175.204.24/register"))
+                    startActivity(i)
                     true
                 }
                 R.id.menuOdhlasenie -> {
@@ -167,10 +192,18 @@ class ProblemListActivity : AppCompatActivity() {
 
         ///////////////END OF MENU STUFF////////////////////////////////////////////
 
+        findViewById<Button>(R.id.zrusitFilter).setOnClickListener {
+            val intent2 = Intent(this, ProblemListActivity::class.java)
+            intent2.putExtra("allProblems", allProblems)
+            startActivity(intent2)
+        }
+
 
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems(0, sessionManager.fetchUserRoleId()?.toInt())
+        val call = request.getProblems(0, zamestnanecFilter,stavProblemuFilter, kategoriaFilter,
+            DatumOdFilter, DatumDoFilter, vozidloFilter, prioritaFilter, stavRieseniaFilter,
+            sessionManager.fetchUserRoleId()?.toInt())
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
@@ -183,13 +216,19 @@ class ProblemListActivity : AppCompatActivity() {
                         "Zaznamy uspesne zobrazene",
                         Toast.LENGTH_SHORT
                     ).show()
+                }else{
+                    Toast.makeText(
+                        this@ProblemListActivity,
+                        "jojojj",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 val problemList = response.body()
                 pocet = 0
 
-                if (allProblems == 1)
-                    pocet = problemList?.size!!
+                if (allProblems == 1 && problemList != null)
+                    pocet = problemList.size
 
                 if (allProblems == 0)
                     for (item in problemList!!)
@@ -254,6 +293,15 @@ class ProblemListActivity : AppCompatActivity() {
                 putExtra("from", allProblems)
                 startActivity(this)
             }
+        }
+
+        findViewById<Button>(R.id.vybratFilter).setOnClickListener()
+        {
+            Intent(this, FilterActivity::class.java).apply {
+                putExtra("allProblems", allProblems)
+                startActivity(this)
+            }
+
         }
 
     }

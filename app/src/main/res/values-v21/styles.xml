@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DatePickerTheme_Dark" parent="Theme.AppCompat.Dialog">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:datePickerStyle">@style/MyDatePickerStyleDark</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:buttonBarPositiveButtonStyle">
+            @color/colorAccent
+        </item>
+        <item name="android:buttonBarNegativeButtonStyle">@color/colorAccent</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <!--selected Item color-->
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <!-- arrow bordercolor(<>)-->
+        <!-- Highlight item color-->
+        <item name="colorControlHighlight">@color/colorPrimaryDark</item>
+        <!--Calender Background color -->
+        <!-- Ok Cancel Color-->
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:colorForeground">@color/colorAccent</item>
+        <!-- Week TextColor-->
+        <item name="android:textColorSecondary">@color/colorAccent</item>
+        <!-- Calender Number color arrow color (< >) -->
+        <item name="android:textColorPrimary">@color/colorPrimaryDark</item>
+        <!--day , month-->
+        <item name="android:textColorPrimaryInverse">@color/colorPrimary</item>
+        <!-- year-->
+        <item name="android:textColorSecondaryInverse">#009688</item>
+    </style>
+    <style name="MyDatePickerStyleDark" parent="@android:style/Widget.Material.DatePicker">
+        <item name="android:headerBackground">@color/colorPrimary</item>
+    </style>
+</resources>

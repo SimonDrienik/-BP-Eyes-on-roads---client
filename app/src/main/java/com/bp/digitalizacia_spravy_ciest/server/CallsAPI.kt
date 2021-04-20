@@ -8,10 +8,13 @@ import retrofit2.http.*
 import java.math.BigInteger
 import com.bp.digitalizacia_spravy_ciest.models.ShowAllProblemsData as Problems1
 
-
 interface CallsAPI {
-    @GET("/showAllAndroid/{x}/{y}")
-    fun getProblems(@Path("x") x: Int?, @Path("y") y: Int?) : Call<List<Problems1?>?>?
+    @GET("/showAllAndroid/{x}/{zamestnanec}/{stavProblemu}/{kategoria}/{datumOd}/{datumDo}/{vozidlo}/{priorita}/{stavRiesenia}/{y}")
+    fun getProblems(@Path("x") x: Int?, @Path("zamestnanec") zamestnanec: String?,
+                    @Path("stavProblemu") stavProblemu: String?, @Path("kategoria") kategoria: String?,
+                    @Path("datumOd") datumOd: String?, @Path("datumDo") datumDo: String?,
+                    @Path("vozidlo") vozidlo: String?, @Path("priorita") priorita: String?,
+                    @Path("stavRiesenia") stavRiesenia: String?, @Path("y") y: Int?) : Call<List<Problems1?>?>?
 
     @GET("/showUsersAndroid")
     fun getUsers() : Call<List<ShowAllUsers?>?>?

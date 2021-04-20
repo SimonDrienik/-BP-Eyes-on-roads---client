@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -167,7 +168,8 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     true
                 }
                 R.id.menuRegistracia -> {
-                    Toast.makeText(this, "registracia", Toast.LENGTH_SHORT).show()
+                    val i = Intent(Intent.ACTION_VIEW, Uri.parse("http://147.175.204.24/register"))
+                    startActivity(i)
                     true
                 }
                 R.id.menuOdhlasenie -> {
@@ -460,7 +462,8 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     fun getAll(map: GoogleMap) {
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems(0, sessionManager.fetchUserRoleId()?.toInt())
+        val call = request.getProblems(0,"-", "-", "-", "0000-00-00", "0000-00-00",
+            "-","-", "-",  sessionManager.fetchUserRoleId()?.toInt())
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             override fun onResponse(
                 call: Call<List<ShowAllProblemsData?>?>,

@@ -232,7 +232,8 @@ class DetailActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menuRegistracia -> {
-                    Toast.makeText(this, "registracia", Toast.LENGTH_SHORT).show()
+                    val i = Intent(Intent.ACTION_VIEW, Uri.parse("http://147.175.204.24/register"))
+                    startActivity(i)
                     true
                 }
                 R.id.menuOdhlasenie -> {
@@ -714,7 +715,8 @@ class DetailActivity : AppCompatActivity() {
     fun getAll(){
         val request = ServiceBuilder.buildService(CallsAPI::class.java)
 
-        val call = request.getProblems(idProblem, sessionManager.fetchUserRoleId()?.toInt())
+        val call = request.getProblems(idProblem, "-", "-", "-", "0000-00-00", "0000-00-00",
+            "-","-", "-", sessionManager.fetchUserRoleId()?.toInt())
         call!!.enqueue(object : Callback<List<ShowAllProblemsData?>?> {
             override fun onResponse(
                 call: Call<List<ShowAllProblemsData?>?>,
