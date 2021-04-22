@@ -29,7 +29,7 @@
             android:contentDescription="@string/app_name"
             android:layout_marginTop="-45dp"
             android:layout_marginLeft="150dp"
-            android:src="@drawable/logo"/>
+            android:src="@drawable/editedlogov2"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/ll_main_layout"
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content" />
             <Button
                 android:id="@+id/btn_submit"
-                android:text="Submit"
+                android:text="Prihlásiť"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/colorAccent"
                 android:layout_width="wrap_content"

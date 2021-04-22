@@ -39,7 +39,7 @@
         app:layout_constraintHorizontal_bias="0.444"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:srcCompat="@drawable/logo" />
+        app:srcCompat="@drawable/editedlogov2" />
 
     <ImageView
         android:id="@+id/imageView2"

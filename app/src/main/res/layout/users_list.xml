@@ -29,7 +29,7 @@
             android:contentDescription="@string/app_name"
             android:layout_marginTop="-45dp"
             android:layout_marginLeft="150dp"
-            android:src="@drawable/logo"/>
+            android:src="@drawable/editedlogov2"/>
     </LinearLayout>
     <RelativeLayout
         android:layout_width="match_parent"

@@ -36,7 +36,7 @@
         android:fontFamily="monospace"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:text="Zrusit"
+        android:text="Zrušiť"
         app:backgroundTint="@android:color/holo_red_dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -50,7 +50,7 @@
         android:fontFamily="monospace"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:text="Odoslat"
+        android:text="Odoslať"
         app:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

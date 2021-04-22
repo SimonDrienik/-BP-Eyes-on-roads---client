@@ -3,8 +3,8 @@
     <string name="title_activity_maps">Map</string>
     <string name="dropped_pin">Droped Pin</string>
     <string name="pridanie_noveho_hlasenia_problemu">Pridanie nového hlásenia</string>
-    <string name="cancel">Cancel</string>
-    <string name="confim">Confirm</string>
+    <string name="cancel">Zrušiť</string>
+    <string name="confim">Potvrdiť</string>
     <string name="kategoria">Kategoria</string>
     <string name="stav_problemu">Stav problému</string>
     <string name="popis_problemu">Popis problému *</string>
@@ -13,16 +13,16 @@
     <string name="NahlasProblemyNaCestach">Nahlás problémy na cestách</string>
     <string name="profil">profil</string>
     <string name="settings">nastavenia</string>
-    <string name="moje_problemy">Moje problemy</string>
-    <string name="vsetky_problemy">Vsetky problemy</string>
-    <string name="zoznam_pouzivatel">Zoznam pouzivatelov</string>
-    <string name="mapa_problemov">Mapa problemov</string>
+    <string name="moje_problemy">Moje problémy</string>
+    <string name="vsetky_problemy">Všetky problémy</string>
+    <string name="zoznam_pouzivatel">Zoznam použivatelov</string>
+    <string name="mapa_problemov">Mapa problémov</string>
 
     <string name="spinner_name">SpinnerInKotlin</string>
     <string name="selected_item">Selected item:</string>
 
     <string-array name="Languages">
-        <item>Vyberte typ problemu</item>
+        <item>Vyberte typ problému</item>
         <item>Stav vozovky</item>
         <item>Dopravné značenie</item>
         <item>Kvalita opravy</item>
@@ -30,16 +30,16 @@
     </string-array>
 
     <string name="spinner2_name">SpinnerInKotlin</string>
-    <string name="nove_hlasenie">Nove hlasenie</string>
+    <string name="nove_hlasenie">Nové hlasenie</string>
     <string name="api_key">api_key</string>
-    <string name="prihlaseny">Prihlaseny</string>
+    <string name="prihlaseny">Prihláseny</string>
     <string name="profil1">Profil</string>
-    <string name="prihlasit">Prihlasit</string>
-    <string name="odhlasit">Odhlasit</string>
-    <string name="regsitracia">Regsitracia</string>
+    <string name="prihlasit">Prihlásiť</string>
+    <string name="odhlasit">Odhlásiť</string>
+    <string name="regsitracia">Regsitrácia</string>
 
     <string-array name="stav_problemu">
-        <item>Vyberte stav problemu</item>
+        <item>Vyberte stav problému</item>
         <item>Chybajuca</item>
         <item>Poškodená</item>
         <item>Vyblednuta</item>

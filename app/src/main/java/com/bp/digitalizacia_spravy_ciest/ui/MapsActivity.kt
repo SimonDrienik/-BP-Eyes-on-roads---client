@@ -275,7 +275,7 @@ class MapsActivity :AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         map = googleMap
         val Trnava = LatLng(48.717850, 19.457415)
         map.addMarker(MarkerOptions().position(Trnava).title("Vitajte"))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(Trnava, 3.0f)) //nastavenie inintial zoom
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(Trnava, 6.0f)) //nastavenie inintial zoom
         map.getUiSettings().setZoomControlsEnabled(false)
         map.setOnMarkerClickListener(this)
         setUpMap()
